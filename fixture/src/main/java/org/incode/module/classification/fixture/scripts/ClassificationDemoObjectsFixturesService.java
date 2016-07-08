@@ -27,7 +27,7 @@ import org.apache.isis.applib.fixturescripts.FixtureResult;
 import org.apache.isis.applib.fixturescripts.FixtureScript;
 import org.apache.isis.applib.fixturescripts.FixtureScripts;
 import org.apache.isis.applib.fixturescripts.SimpleFixtureScript;
-import org.incode.module.classification.fixture.scripts.scenarios.AliasDemoObjectsFixture;
+import org.incode.module.classification.fixture.scripts.scenarios.ClassifiableDemoObjectsFixture;
 
 /**
  * Enables fixtures to be installed from the application.
@@ -40,10 +40,10 @@ import org.incode.module.classification.fixture.scripts.scenarios.AliasDemoObjec
         menuOrder = "20",
         menuBar = DomainServiceLayout.MenuBar.SECONDARY
 )
-public class AliasDemoObjectsFixturesService extends FixtureScripts {
+public class ClassificationDemoObjectsFixturesService extends FixtureScripts {
 
-    public AliasDemoObjectsFixturesService() {
-        super(AliasDemoObjectsFixturesService.class.getPackage().getName());
+    public ClassificationDemoObjectsFixturesService() {
+        super(ClassificationDemoObjectsFixturesService.class.getPackage().getName());
     }
 
     @Override // compatibility with core 1.5.0
@@ -68,7 +68,7 @@ public class AliasDemoObjectsFixturesService extends FixtureScripts {
     )
     @MemberOrder(sequence="20")
     public Object installFixturesAndReturnFirst() {
-        final FixtureScript script = findFixtureScriptFor(AliasDemoObjectsFixture.class);
+        final FixtureScript script = findFixtureScriptFor(ClassifiableDemoObjectsFixture.class);
         final List<FixtureResult> run = script.run(null);
         return run.get(0).getObject();
     }

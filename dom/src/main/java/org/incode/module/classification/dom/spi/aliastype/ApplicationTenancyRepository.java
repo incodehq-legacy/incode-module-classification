@@ -20,13 +20,11 @@ package org.incode.module.classification.dom.spi.aliastype;
 
 import java.util.Collection;
 
-import org.incode.module.classification.dom.api.classifiable.Classifiable;
-
 /**
- * Mandatory SPI service that returns the application tenancy (path)s for a given aliasable.
+ * Mandatory SPI service that returns the application tenancy (path)s for a given classifiable object.
  */
 public interface ApplicationTenancyRepository {
 
-    Collection<String> atPathsFor(final Classifiable classifiable);
+    Collection<String> atPathsFor(final Object classifiable);
 
 }

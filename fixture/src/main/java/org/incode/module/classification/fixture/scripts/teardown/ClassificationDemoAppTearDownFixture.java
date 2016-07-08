@@ -19,15 +19,16 @@ package org.incode.module.classification.fixture.scripts.teardown;
 import org.apache.isis.applib.fixturescripts.FixtureScript;
 import org.apache.isis.applib.services.jdosupport.IsisJdoSupport;
 
-public class AliasDemoObjectsTearDownFixture extends FixtureScript {
+public class ClassificationDemoAppTearDownFixture extends FixtureScript {
 
     @Override
     protected void execute(final ExecutionContext executionContext) {
-        isisJdoSupport.executeUpdate("delete from \"classificationdemo\".\"ClassifiableLinkForDemoObject\"");
-        isisJdoSupport.executeUpdate("delete from \"classificationdemo\".\"ClassificationDemoObject\"");
+        isisJdoSupport.executeUpdate("delete from \"classificationdemo\".\"ClassifiableLinkForDomainObject\"");
+        isisJdoSupport.executeUpdate("delete from \"classificationdemo\".\"ClassifiableDomainObject\"");
 
+        isisJdoSupport.executeUpdate("delete from \"incodeClassification\".\"Applicability\"");
+        isisJdoSupport.executeUpdate("delete from \"incodeClassification\".\"Classification\"");
         isisJdoSupport.executeUpdate("delete from \"incodeClassification\".\"ClassifiableLink\"");
-        isisJdoSupport.executeUpdate("delete from \"incodeClassification\".\"Alias\"");
     }
 
 

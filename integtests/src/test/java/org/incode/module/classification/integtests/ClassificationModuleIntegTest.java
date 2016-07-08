@@ -41,11 +41,9 @@ import org.isisaddons.module.fakedata.dom.FakeDataService;
 
 import org.incode.module.classification.app.ClassificationModuleAppManifest;
 import org.incode.module.classification.dom.api.classifiable.Classifiable;
-import org.incode.module.classification.dom.impl.classification.Alias;
-import org.incode.module.classification.dom.impl.classification.Alias_remove;
-import org.incode.module.classification.dom.impl.classification.Aliasable_addAlias;
-import org.incode.module.classification.dom.impl.classification.Aliasable_aliases;
-import org.incode.module.classification.dom.impl.classification.Aliasable_removeAlias;
+import org.incode.module.classification.dom.impl.classifiablelink.Object_classify;
+import org.incode.module.classification.dom.impl.classifiablelink.Object_classificationLinks;
+import org.incode.module.classification.dom.impl.classifiablelink.Object_unclassify;
 
 public abstract class ClassificationModuleIntegTest extends IntegrationTestAbstract {
 
@@ -59,19 +57,15 @@ public abstract class ClassificationModuleIntegTest extends IntegrationTestAbstr
     protected FakeDataService fakeData;
 
 
-    protected Aliasable_addAlias mixinAddAlias(final Classifiable classifiable) {
-        return mixin(Aliasable_addAlias.class, classifiable);
+    protected Object_classify mixinAddAlias(final Classifiable classifiable) {
+        return mixin(Object_classify.class, classifiable);
     }
-    protected Aliasable_removeAlias mixinRemoveAlias(final Classifiable classifiable) {
-        return mixin(Aliasable_removeAlias.class, classifiable);
-    }
-
-    protected Aliasable_aliases mixinAliases(final Classifiable classifiable) {
-        return mixin(Aliasable_aliases.class, classifiable);
+    protected Object_unclassify removeClassificationFrom(final Classifiable classifiable) {
+        return mixin(Object_unclassify.class, classifiable);
     }
 
-    protected Alias_remove mixinRemove(final Alias alias) {
-        return mixin(Alias_remove.class, alias);
+    protected Object_classificationLinks classificationsOf(final Object classifiable) {
+        return mixin(Object_classificationLinks.class, classifiable);
     }
 
     protected static <T> List<T> asList(final Iterable<T> iterable) {

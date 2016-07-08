@@ -24,10 +24,11 @@ public final class ClassificationModule {
 
         private JdoColumnLength(){}
 
-        // TODO: review these constants
+        public static final int FULLY_QUALIFIED_NAME = 254;
+        public static final int LOCAL_NAME = 30;
         public static final int AT_PATH = 254;
-        public static final int ALIAS_TYPE_ID = 254;
-        public static final int ALIAS_REFERENCE = 254;
+        public static final int DOMAIN_TYPE = 254;
+        public static final int IDENTIFIER = 254;
     }
 
 

@@ -14,10 +14,10 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.incode.module.classification.fixture.dom.classificationdemoobject;
+package org.incode.module.classification.fixture.dom.classifiable;
 
 import java.util.List;
-import org.apache.isis.applib.DomainObjectContainer;
+
 import org.apache.isis.applib.annotation.Action;
 import org.apache.isis.applib.annotation.ActionLayout;
 import org.apache.isis.applib.annotation.BookmarkPolicy;
@@ -27,15 +27,16 @@ import org.apache.isis.applib.annotation.MemberOrder;
 import org.apache.isis.applib.annotation.NatureOfService;
 import org.apache.isis.applib.annotation.ParameterLayout;
 import org.apache.isis.applib.annotation.SemanticsOf;
+import org.apache.isis.applib.services.repository.RepositoryService;
 
 @DomainService(
         nature = NatureOfService.VIEW,
-        repositoryFor = ClassificationDemoObject.class
+        repositoryFor = ClassifiableDomainObject.class
 )
 @DomainServiceLayout(
         menuOrder = "10"
 )
-public class AliasDemoObjectMenu {
+public class ClassifiableDomainObjectMenu {
 
 
     //region > listAll (action)
@@ -47,21 +48,22 @@ public class AliasDemoObjectMenu {
             bookmarking = BookmarkPolicy.AS_ROOT
     )
     @MemberOrder(sequence = "1")
-    public List<ClassificationDemoObject> listAll() {
-        return container.allInstances(ClassificationDemoObject.class);
+    public List<ClassifiableDomainObject> listAll() {
+        return repositoryService.allInstances(ClassifiableDomainObject.class);
     }
 
     //endregion
 
-    //region > create (action)
+    //region > createTopLevel (action)
     
     @MemberOrder(sequence = "2")
-    public ClassificationDemoObject create(
+    public ClassifiableDomainObject create(
             @ParameterLayout(named = "Name")
-            final String name) {
-        final ClassificationDemoObject obj = container.newTransientInstance(ClassificationDemoObject.class);
-        obj.setName(name);
-        container.persistIfNotAlready(obj);
+            final String name,
+            @ParameterLayout(named = "Application tenancy")
+            final String atPath) {
+        final ClassifiableDomainObject obj = new ClassifiableDomainObject(name, atPath);
+        repositoryService.persist(obj);
         return obj;
     }
 
@@ -69,8 +71,8 @@ public class AliasDemoObjectMenu {
 
     //region > injected services
 
-    @javax.inject.Inject 
-    DomainObjectContainer container;
+    @javax.inject.Inject
+    RepositoryService repositoryService;
 
     //endregion
 

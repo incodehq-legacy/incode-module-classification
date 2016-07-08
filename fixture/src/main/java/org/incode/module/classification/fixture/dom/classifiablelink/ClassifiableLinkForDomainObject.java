@@ -31,9 +31,8 @@ import org.apache.isis.applib.annotation.DomainServiceLayout;
 import org.apache.isis.applib.annotation.NatureOfService;
 import org.apache.isis.applib.annotation.Programmatic;
 
-import org.incode.module.classification.dom.api.classifiable.Classifiable;
-import org.incode.module.classification.dom.impl.classificationlink.ClassifiableLink;
-import org.incode.module.classification.fixture.dom.classificationdemoobject.ClassificationDemoObject;
+import org.incode.module.classification.dom.impl.classifiablelink.ClassifiableLink;
+import org.incode.module.classification.fixture.dom.classifiable.ClassifiableDomainObject;
 
 @javax.jdo.annotations.PersistenceCapable(
         identityType= IdentityType.DATASTORE,
@@ -41,9 +40,9 @@ import org.incode.module.classification.fixture.dom.classificationdemoobject.Cla
 @javax.jdo.annotations.Inheritance(
         strategy = InheritanceStrategy.NEW_TABLE)
 @DomainObject(
-        objectType = "classificationdemo.ClassifiableLinkForDemoObject"
+        objectType = "classificationdemo.ClassifiableLinkForDomainObject"
 )
-public class ClassifiableLinkForDemoObject extends ClassifiableLink {
+public class ClassifiableLinkForDomainObject extends ClassifiableLink {
 
     //region > instantiationSubscriber, setPolymorphicReference
     @DomainService(nature = NatureOfService.DOMAIN)
@@ -52,32 +51,32 @@ public class ClassifiableLinkForDemoObject extends ClassifiableLink {
         @Programmatic
         @Subscribe
         public void on(final InstantiateEvent ev) {
-            if(ev.getPolymorphicReference() instanceof ClassificationDemoObject) {
-                ev.setSubtype(ClassifiableLinkForDemoObject.class);
+            if(ev.getPolymorphicReference() instanceof ClassifiableDomainObject) {
+                ev.setSubtype(ClassifiableLinkForDomainObject.class);
             }
         }
     }
 
     @Override
-    public void setPolymorphicReference(final Classifiable polymorphicReference) {
+    public void setPolymorphicReference(final Object polymorphicReference) {
         super.setPolymorphicReference(polymorphicReference);
-        setDemoObject((ClassificationDemoObject) polymorphicReference);
+        setDomainObject((ClassifiableDomainObject) polymorphicReference);
     }
     //endregion
 
-    //region > demoObject (property)
-    private ClassificationDemoObject demoObject;
+    //region > domainObject (property)
+    private ClassifiableDomainObject domainObject;
 
     @Column(
             allowsNull = "false",
-            name = "demoObjectId"
+            name = "domainObjectId"
     )
-    public ClassificationDemoObject getDemoObject() {
-        return demoObject;
+    public ClassifiableDomainObject getDomainObject() {
+        return domainObject;
     }
 
-    public void setDemoObject(final ClassificationDemoObject demoObject) {
-        this.demoObject = demoObject;
+    public void setDomainObject(final ClassifiableDomainObject domainObject) {
+        this.domainObject = domainObject;
     }
     //endregion
 }

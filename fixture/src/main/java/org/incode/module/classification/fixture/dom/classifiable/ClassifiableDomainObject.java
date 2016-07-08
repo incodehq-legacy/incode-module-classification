@@ -14,7 +14,7 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.incode.module.classification.fixture.dom.classificationdemoobject;
+package org.incode.module.classification.fixture.dom.classifiable;
 
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.VersionStrategy;
@@ -26,8 +26,6 @@ import org.apache.isis.applib.annotation.Editing;
 import org.apache.isis.applib.annotation.Title;
 import org.apache.isis.applib.util.ObjectContracts;
 
-import org.incode.module.classification.dom.api.classifiable.Classifiable;
-
 @javax.jdo.annotations.PersistenceCapable(
         identityType=IdentityType.DATASTORE,
         schema="classificationdemo")
@@ -38,13 +36,18 @@ import org.incode.module.classification.dom.api.classifiable.Classifiable;
         strategy=VersionStrategy.VERSION_NUMBER, 
         column="version")
 @DomainObject(
-        objectType = "classificationdemo.ClassificationDemoObject",
+        objectType = "classificationdemo.ClassifiableDomainObject",
         editing = Editing.DISABLED
 )
 @DomainObjectLayout(
         bookmarking = BookmarkPolicy.AS_ROOT
 )
-public class ClassificationDemoObject implements Comparable<ClassificationDemoObject>, Classifiable {
+public class ClassifiableDomainObject implements Comparable<ClassifiableDomainObject> {
+
+    public ClassifiableDomainObject(final String name, final String atPath) {
+        setName(name);
+        setAtPath(atPath);
+    }
 
     //region > name (property)
     
@@ -62,6 +65,21 @@ public class ClassificationDemoObject implements Comparable<ClassificationDemoOb
 
     //endregion
 
+    //region > atPath (property)
+
+    private String atPath;
+
+    @javax.jdo.annotations.Column(allowsNull="false")
+    public String getAtPath() {
+        return atPath;
+    }
+
+    public void setAtPath(final String atPath) {
+        this.atPath = atPath;
+    }
+
+    //endregion
+
     //region > toString, compareTo
 
     @Override
@@ -70,7 +88,7 @@ public class ClassificationDemoObject implements Comparable<ClassificationDemoOb
     }
 
     @Override
-    public int compareTo(final ClassificationDemoObject other) {
+    public int compareTo(final ClassifiableDomainObject other) {
         return ObjectContracts.compare(this, other, "name");
     }
 

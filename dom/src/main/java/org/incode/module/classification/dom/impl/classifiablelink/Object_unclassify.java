@@ -16,9 +16,8 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.incode.module.classification.dom.impl.classification;
+package org.incode.module.classification.dom.impl.classifiablelink;
 
-import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -32,55 +31,49 @@ import org.apache.isis.applib.annotation.SemanticsOf;
 import org.incode.module.classification.dom.api.classifiable.Classifiable;
 
 @Mixin
-public class Aliasable_removeAlias {
+public class Object_unclassify {
 
     //region  > (injected)
     @Inject
-    AliasRepository aliasRepository;
+    ClassifiableLinkRepository classifiableLinkRepository;
     //endregion
 
     //region > constructor
-    private final Classifiable classifiable;
-    public Aliasable_removeAlias(final Classifiable classifiable) {
+    private final Object classifiable;
+    public Object_unclassify(final Object classifiable) {
         this.classifiable = classifiable;
     }
 
-    public Classifiable getClassifiable() {
+    public Object getClassifiable() {
         return classifiable;
     }
     //endregion
 
-    public static class DomainEvent extends Classifiable.ActionDomainEvent<Aliasable_removeAlias> { } { }
+    public static class DomainEvent extends Classifiable.ActionDomainEvent<Object_unclassify> { } { }
 
     @Action(
             domainEvent = DomainEvent.class,
-            semantics = SemanticsOf.IDEMPOTENT_ARE_YOU_SURE
+            semantics = SemanticsOf.IDEMPOTENT
     )
     @ActionLayout(
             cssClassFa = "fa-minus"
     )
-    @MemberOrder(name = "aliases", sequence = "2")
-    public Classifiable $$(final Alias alias) {
-        aliasRepository.remove(alias);
+    @MemberOrder(name = "classificationLinks", sequence = "2")
+    public Object $$(final ClassifiableLink classifiableLink) {
+        classifiableLinkRepository.delete(classifiableLink);
         return this.classifiable;
     }
 
-    public String disable$$(final Alias alias) {
-        return choices0$$().isEmpty() ? "No aliases to remove" : null;
+    public String disable$$() {
+        return choices0$$().isEmpty()? "No classifications to delete": null;
     }
 
-    public List<Alias> choices0$$() {
-        return this.classifiable != null ? aliasRepository.findByAliasable(this.classifiable): Collections.emptyList();
+    public List<ClassifiableLink> choices0$$() {
+        return classifiableLinkRepository.findByClassifiableAndDate(this.classifiable, null);
     }
 
-    public Alias default0$$() {
-        return firstOf(choices0$$());
+    public boolean hide$$() {
+        return !classifiableLinkRepository.supports(classifiable);
     }
-
-    //region > helpers
-    static <T> T firstOf(final List<T> list) {
-        return list.isEmpty()? null: list.get(0);
-    }
-    //endregion
 
 }

@@ -20,6 +20,9 @@ package org.incode.module.classification.dom.api.classifiable;
 
 import org.incode.module.classification.dom.ClassificationModule;
 
+/**
+ * Marker interface that objects can implement to provide automatic binding of mixins.
+ */
 public interface Classifiable {
 
     abstract class PropertyDomainEvent<S,T> extends ClassificationModule.PropertyDomainEvent<S, T> { }

@@ -4,11 +4,8 @@
 image:https://travis-ci.org/incodehq/incode-module-classification.png?branch=master[Build Status,link=https://travis-ci.org/incodehq/incode-module-classification]
 
 This module, intended for use with link:http://isis.apache.org[Apache Isis], provides the ability to classify any
-(arbitrary) domain object against a pre-defined set of categorizations available for that type of domain object.  A
-`CharacterizationCategory` defines a particular classification (similar to an enum), eg "PrivilegeLevel" and applies
-to a specified domain type (eg Customer).  A `CharacterizationValue` is a particular value within that classification
-(similar to an enum instance), eg "PrivilegeValue#GOLD", and applies to a specific instance of the domain type
-(eg "John Doe: Customer").
+(arbitrary) domain object against a pre-defined set of classifications available for that type of domain object (and
+application tenancy).
 
 
 == Screenshots
@@ -222,16 +219,16 @@ public class AliasableLinkForDemoObject extends AliasableLink {                 
         setDemoObject((AliasDemoObject) polymorphicReference);
     }
 
-    private AliasDemoObject demoObject;
+    private AliasDemoObject domainObject;
     @Column(
             allowsNull = "false",
             name = "demoObjectId"
     )
     public AliasDemoObject getDemoObject() {                                     // <4>
-        return demoObject;
+        return domainObject;
     }
-    public void setDemoObject(final AliasDemoObject demoObject) {
-        this.demoObject = demoObject;
+    public void setDemoObject(final AliasDemoObject domainObject) {
+        this.domainObject = domainObject;
     }
 }
 ----

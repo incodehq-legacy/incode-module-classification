@@ -16,7 +16,7 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.incode.module.classification.dom.impl.classification;
+package org.incode.module.classification.dom.impl.classifiablelink;
 
 import java.util.List;
 
@@ -27,31 +27,30 @@ import org.apache.isis.applib.annotation.ActionLayout;
 import org.apache.isis.applib.annotation.CollectionLayout;
 import org.apache.isis.applib.annotation.Contributed;
 import org.apache.isis.applib.annotation.Mixin;
-import org.apache.isis.applib.annotation.RenderType;
 import org.apache.isis.applib.annotation.SemanticsOf;
 
 import org.incode.module.classification.dom.api.classifiable.Classifiable;
 
 @Mixin
-public class Aliasable_aliases {
+public class Object_classificationLinks {
 
     //region  > (injected)
     @Inject
-    AliasRepository aliasRepository;
+    ClassifiableLinkRepository classifiableLinkRepository;
     //endregion
 
     //region > constructor
-    private final Classifiable classifiable;
-    public Aliasable_aliases(final Classifiable classifiable) {
+    private final Object classifiable;
+    public Object_classificationLinks(final Object classifiable) {
         this.classifiable = classifiable;
     }
 
-    public Classifiable getClassifiable() {
+    public Object getClassifiable() {
         return classifiable;
     }
     //endregion
 
-    public static class DomainEvent extends Classifiable.ActionDomainEvent<Aliasable_aliases> { } { }
+    public static class DomainEvent extends Classifiable.ActionDomainEvent<Object_classificationLinks> { } { }
     @Action(
             domainEvent = DomainEvent.class,
             semantics = SemanticsOf.SAFE
@@ -60,11 +59,15 @@ public class Aliasable_aliases {
             contributed = Contributed.AS_ASSOCIATION
     )
     @CollectionLayout(
-            named = "Aliases", // regression in isis 1.11.x requires this to be specified
-            render = RenderType.EAGERLY
+            named = "Classifications",
+            defaultView = "table"
     )
-    public List<Alias> $$() {
-        return aliasRepository.findByAliasable(this.classifiable);
+    public List<ClassifiableLink> $$() {
+        return classifiableLinkRepository.findByClassifiableAndDate(classifiable, null);
+    }
+
+    public boolean hide$$() {
+        return !classifiableLinkRepository.supports(classifiable);
     }
 
 }
