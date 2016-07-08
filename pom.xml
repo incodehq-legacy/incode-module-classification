@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- 
-Copyright 2014~2015 Dan Haywood
+Copyright 2016 Dan Haywood
 
 Licensed under the Apache License, Version 2.0 (the "License"); 
 you may not use this file except in compliance with the License. 
@@ -17,8 +17,8 @@ language governing permissions and limitations under the License.
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.incode.module.alias</groupId>
-    <artifactId>incode-module-alias</artifactId>
+    <groupId>org.incode.module.classification</groupId>
+    <artifactId>incode-module-classification</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 
     <name>Incode Note Module</name>
@@ -32,7 +32,7 @@ language governing permissions and limitations under the License.
     <properties>
         <isis.version>1.13.0-SNAPSHOT</isis.version>
 
-        <incode-module-alias.version>1.13.0-SNAPSHOT</incode-module-alias.version>
+        <incode-module-classification.version>1.13.0-SNAPSHOT</incode-module-classification.version>
         <isis-module-fakedata-dom.version>1.13.0-SNAPSHOT</isis-module-fakedata-dom.version>
         <assertj-core.version>3.3.0</assertj-core.version>
         <danhaywood-java-assertjext.version>0.1.0</danhaywood-java-assertjext.version>
@@ -239,23 +239,23 @@ language governing permissions and limitations under the License.
             <!-- this project's own modules -->
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>incode-module-alias-dom</artifactId>
-                <version>${incode-module-alias.version}</version>
+                <artifactId>incode-module-classification-dom</artifactId>
+                <version>${incode-module-classification.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>incode-module-alias-app</artifactId>
+                <artifactId>incode-module-classification-app</artifactId>
                 <version>0.0.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>incode-module-alias-fixture</artifactId>
+                <artifactId>incode-module-classification-fixture</artifactId>
                 <version>0.0.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>incode-module-alias-webapp</artifactId>
+                <artifactId>incode-module-classification-webapp</artifactId>
                 <version>0.0.1-SNAPSHOT</version>
             </dependency>
 

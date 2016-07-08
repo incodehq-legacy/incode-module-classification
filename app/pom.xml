@@ -21,13 +21,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.incode.module.alias</groupId>
-        <artifactId>incode-module-alias</artifactId>
+        <groupId>org.incode.module.classification</groupId>
+        <artifactId>incode-module-classification</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>incode-module-alias-app</artifactId>
-    <name>Incode Alias Module Application</name>
+    <artifactId>incode-module-classification-app</artifactId>
+    <name>Incode Classification Module Application</name>
 
     <build>
         <resources>
@@ -51,7 +51,7 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>incode-module-alias-fixture</artifactId>
+            <artifactId>incode-module-classification-fixture</artifactId>
         </dependency>
 
         <dependency>

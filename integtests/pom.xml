@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- 
-Copyright 2014~2015 Dan Haywood
+Copyright 2016 Dan Haywood
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -19,13 +19,13 @@ Copyright 2014~2015 Dan Haywood
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.incode.module.alias</groupId>
-        <artifactId>incode-module-alias</artifactId>
+        <groupId>org.incode.module.classification</groupId>
+        <artifactId>incode-module-classification</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>incode-module-alias-integtests</artifactId>
-    <name>Incode Alias Module IntegTests</name>
+    <artifactId>incode-module-classification-integtests</artifactId>
+    <name>Incode Classification Module IntegTests</name>
 
     <build>
         <testResources>
@@ -47,11 +47,11 @@ Copyright 2014~2015 Dan Haywood
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>incode-module-alias-fixture</artifactId>
+            <artifactId>incode-module-classification-fixture</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>incode-module-alias-app</artifactId>
+            <artifactId>incode-module-classification-app</artifactId>
         </dependency>
 
         <dependency>
