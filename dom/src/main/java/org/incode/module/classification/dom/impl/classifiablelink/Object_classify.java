@@ -42,7 +42,7 @@ import org.incode.module.classification.dom.ClassificationModule;
 import org.incode.module.classification.dom.impl.applicability.Applicability;
 import org.incode.module.classification.dom.impl.applicability.ApplicabilityRepository;
 import org.incode.module.classification.dom.impl.classification.Classification;
-import org.incode.module.classification.dom.spi.aliastype.ApplicationTenancyRepository;
+import org.incode.module.classification.dom.spi.ApplicationTenancyRepository;
 
 @Mixin
 public class Object_classify {

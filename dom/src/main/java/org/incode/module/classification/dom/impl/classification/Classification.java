@@ -29,7 +29,6 @@ import org.apache.isis.applib.services.title.TitleService;
 import org.apache.isis.applib.util.ObjectContracts;
 
 import org.incode.module.classification.dom.ClassificationModule;
-import org.incode.module.classification.dom.api.classifiable.Classifiable;
 import org.incode.module.classification.dom.impl.applicability.Applicability;
 import org.incode.module.classification.dom.impl.classifiablelink.ClassifiableLinkRepository;
 
@@ -38,7 +37,7 @@ import lombok.Setter;
 
 /**
  * An event that has or is scheduled to occur at some point in time, pertaining
- * to an {@link Classifiable}.
+ * to an "classifiable" domain object.
  */
 @javax.jdo.annotations.PersistenceCapable(
         schema = "incodeClassification",

@@ -16,15 +16,14 @@ import org.apache.isis.applib.util.ObjectContracts;
 import org.apache.isis.applib.util.TitleBuffer;
 
 import org.incode.module.classification.dom.ClassificationModule;
-import org.incode.module.classification.dom.api.classifiable.Classifiable;
 import org.incode.module.classification.dom.impl.classification.Classification;
 
 import lombok.Getter;
 import lombok.Setter;
 
 /**
- * An event that has or is scheduled to occur at some point in time, pertaining
- * to an {@link Classifiable}.
+ * Indicates whether a domain object('s type) is applicable to a particular {@link Classification}, with respect to
+ * the application tenancy of that domain object.
  */
 @javax.jdo.annotations.PersistenceCapable(
         schema = "incodeClassification",

@@ -31,7 +31,7 @@ import org.apache.isis.applib.services.repository.RepositoryService;
 
 @DomainService(
         nature = NatureOfService.VIEW,
-        repositoryFor = ClassifiableDomainObject.class
+        repositoryFor = ClassifiableDemoObject.class
 )
 @DomainServiceLayout(
         menuOrder = "10"
@@ -48,8 +48,8 @@ public class ClassifiableDomainObjectMenu {
             bookmarking = BookmarkPolicy.AS_ROOT
     )
     @MemberOrder(sequence = "1")
-    public List<ClassifiableDomainObject> listAll() {
-        return repositoryService.allInstances(ClassifiableDomainObject.class);
+    public List<ClassifiableDemoObject> listAll() {
+        return repositoryService.allInstances(ClassifiableDemoObject.class);
     }
 
     //endregion
@@ -57,12 +57,12 @@ public class ClassifiableDomainObjectMenu {
     //region > createTopLevel (action)
     
     @MemberOrder(sequence = "2")
-    public ClassifiableDomainObject create(
+    public ClassifiableDemoObject create(
             @ParameterLayout(named = "Name")
             final String name,
             @ParameterLayout(named = "Application tenancy")
             final String atPath) {
-        final ClassifiableDomainObject obj = new ClassifiableDomainObject(name, atPath);
+        final ClassifiableDemoObject obj = new ClassifiableDemoObject(name, atPath);
         repositoryService.persist(obj);
         return obj;
     }

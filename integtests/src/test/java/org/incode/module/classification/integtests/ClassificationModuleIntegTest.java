@@ -40,7 +40,6 @@ import org.isisaddons.module.fakedata.FakeDataModule;
 import org.isisaddons.module.fakedata.dom.FakeDataService;
 
 import org.incode.module.classification.app.ClassificationModuleAppManifest;
-import org.incode.module.classification.dom.api.classifiable.Classifiable;
 import org.incode.module.classification.dom.impl.classifiablelink.Object_classify;
 import org.incode.module.classification.dom.impl.classifiablelink.Object_classificationLinks;
 import org.incode.module.classification.dom.impl.classifiablelink.Object_unclassify;
@@ -57,14 +56,14 @@ public abstract class ClassificationModuleIntegTest extends IntegrationTestAbstr
     protected FakeDataService fakeData;
 
 
-    protected Object_classify mixinAddAlias(final Classifiable classifiable) {
+    protected Object_classify mixinClassify(final Object classifiable) {
         return mixin(Object_classify.class, classifiable);
     }
-    protected Object_unclassify removeClassificationFrom(final Classifiable classifiable) {
+    protected Object_unclassify mixinUnclassify(final Object classifiable) {
         return mixin(Object_unclassify.class, classifiable);
     }
 
-    protected Object_classificationLinks classificationsOf(final Object classifiable) {
+    protected Object_classificationLinks classificationLinksOf(final Object classifiable) {
         return mixin(Object_classificationLinks.class, classifiable);
     }
 

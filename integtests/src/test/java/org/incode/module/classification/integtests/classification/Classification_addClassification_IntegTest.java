@@ -20,7 +20,7 @@ import javax.inject.Inject;
 
 import org.junit.Before;
 
-import org.incode.module.classification.dom.spi.aliastype.ApplicationTenancyRepository;
+import org.incode.module.classification.dom.spi.ApplicationTenancyRepository;
 import org.incode.module.classification.fixture.dom.classifiable.ClassifiableDomainObjectMenu;
 import org.incode.module.classification.fixture.scripts.teardown.ClassificationDemoAppTearDownFixture;
 import org.incode.module.classification.integtests.ClassificationModuleIntegTest;
@@ -46,7 +46,7 @@ public class Classification_addClassification_IntegTest extends ClassificationMo
 //
 //        @Before
 //        public void setUp() throws Exception {
-//            assertThat(wrap(classificationsOf(classifiable)).$$()).isEmpty();
+//            assertThat(wrap(classificationLinksOf(classifiable)).$$()).isEmpty();
 //        }
 //
 //        @Test
@@ -60,10 +60,10 @@ public class Classification_addClassification_IntegTest extends ClassificationMo
 //            final AliasType randomAliasType = fakeData.collections().anyOf(aliasTypes);
 //            final String randomAliasRef = fakeData.strings().digits(10);
 //
-//            wrap(mixinAddAlias(classifiable)).$$(randomAtPath, randomAliasType, randomAliasRef);
+//            wrap(mixinClassify(classifiable)).$$(randomAtPath, randomAliasType, randomAliasRef);
 //
 //            // then
-//            final List<Classification> aliases = wrap(classificationsOf(classifiable)).$$();
+//            final List<Classification> aliases = wrap(classificationLinksOf(classifiable)).$$();
 //            assertThat(aliases).hasSize(1);
 //        }
 //
@@ -81,11 +81,11 @@ public class Classification_addClassification_IntegTest extends ClassificationMo
 //                    aliasType -> Objects.equals(aliasType.getId(), randomAliasType.getId()));
 //            final String randomAliasRef = fakeData.strings().digits(10);
 //
-//            wrap(mixinAddAlias(classifiable)).$$(randomAtPath, randomAliasType, randomAliasRef);
-//            wrap(mixinAddAlias(classifiable)).$$(randomAtPath, randomAliasType2, randomAliasRef);
+//            wrap(mixinClassify(classifiable)).$$(randomAtPath, randomAliasType, randomAliasRef);
+//            wrap(mixinClassify(classifiable)).$$(randomAtPath, randomAliasType2, randomAliasRef);
 //
 //            // then
-//            final List<Classification> aliases = wrap(classificationsOf(classifiable)).$$();
+//            final List<Classification> aliases = wrap(classificationLinksOf(classifiable)).$$();
 //            assertThat(aliases).hasSize(2);
 //        }
 //
@@ -102,11 +102,11 @@ public class Classification_addClassification_IntegTest extends ClassificationMo
 //            final AliasType randomAliasType = fakeData.collections().anyOf(aliasTypes);
 //            final String randomAliasRef = fakeData.strings().digits(10);
 //
-//            wrap(mixinAddAlias(classifiable)).$$(randomAtPath, randomAliasType, randomAliasRef);
-//            wrap(mixinAddAlias(classifiable)).$$(randomAtPath2, randomAliasType, randomAliasRef);
+//            wrap(mixinClassify(classifiable)).$$(randomAtPath, randomAliasType, randomAliasRef);
+//            wrap(mixinClassify(classifiable)).$$(randomAtPath2, randomAliasType, randomAliasRef);
 //
 //            // then
-//            final List<Classification> aliases = wrap(classificationsOf(classifiable)).$$();
+//            final List<Classification> aliases = wrap(classificationLinksOf(classifiable)).$$();
 //            assertThat(aliases).hasSize(2);
 //        }
 //
@@ -123,13 +123,13 @@ public class Classification_addClassification_IntegTest extends ClassificationMo
 //            final AliasType randomAliasType = fakeData.collections().anyOf(aliasTypes);
 //            final String randomAliasRef = fakeData.strings().digits(10);
 //
-//            wrap(mixinAddAlias(classifiable)).$$(randomAtPath, randomAliasType, randomAliasRef);
+//            wrap(mixinClassify(classifiable)).$$(randomAtPath, randomAliasType, randomAliasRef);
 //
 //            // when
-//            wrap(mixinAddAlias(classifiable)).$$(randomAtPath, randomAliasType, randomAliasRef);
+//            wrap(mixinClassify(classifiable)).$$(randomAtPath, randomAliasType, randomAliasRef);
 //
 //            // then
-//            final List<Classification> aliases = wrap(classificationsOf(classifiable)).$$();
+//            final List<Classification> aliases = wrap(classificationLinksOf(classifiable)).$$();
 //            assertThat(aliases).isEmpty();
 //        }
 //
@@ -147,11 +147,11 @@ public class Classification_addClassification_IntegTest extends ClassificationMo
 //            final String randomAliasRef = fakeData.strings().digits(10);
 //            final String randomAliasRef2 = fakeData.strings().digits(10);
 //
-//            wrap(mixinAddAlias(classifiable)).$$(randomAtPath, randomAliasType, randomAliasRef);
-//            wrap(mixinAddAlias(classifiable)).$$(randomAtPath, randomAliasType, randomAliasRef2);
+//            wrap(mixinClassify(classifiable)).$$(randomAtPath, randomAliasType, randomAliasRef);
+//            wrap(mixinClassify(classifiable)).$$(randomAtPath, randomAliasType, randomAliasRef2);
 //
 //            // then
-//            final List<Classification> aliases = wrap(classificationsOf(classifiable)).$$();
+//            final List<Classification> aliases = wrap(classificationLinksOf(classifiable)).$$();
 //            assertThat(aliases).hasSize(2);
 //        }
 //
@@ -178,7 +178,7 @@ public class Classification_addClassification_IntegTest extends ClassificationMo
 //        public void fires_event() throws Exception {
 //
 //            // given
-//            assertThat(wrap(classificationsOf(classifiable)).$$()).isEmpty();
+//            assertThat(wrap(classificationLinksOf(classifiable)).$$()).isEmpty();
 //
 //            // when
 //            final Collection<String> atPaths = applicationTenancyRepository.atPathsFor(classifiable);
@@ -188,8 +188,8 @@ public class Classification_addClassification_IntegTest extends ClassificationMo
 //            final AliasType randomAliasType = fakeData.collections().anyOf(aliasTypes);
 //            final String randomAliasRef = fakeData.strings().fixed(10);
 //
-//            final Object_classify mixinAddAlias = mixinAddAlias(classifiable);
-//            wrap(mixinAddAlias).$$(randomAtPath, randomAliasType, randomAliasRef);
+//            final Object_classify mixinClassify = mixinClassify(classifiable);
+//            wrap(mixinClassify).$$(randomAtPath, randomAliasType, randomAliasRef);
 //
 //            // then
 //            assertThat(subscriber.ev).isNotNull();
@@ -197,7 +197,7 @@ public class Classification_addClassification_IntegTest extends ClassificationMo
 //            // the following is no longer true (ISIS-1425); the wrapper factory dereferences the mixin to invoke
 //            // the mixed-in action on the domain object.  The net result is we get a new instance of the mixin as
 //            // the source of the event.
-//            // assertThat(subscriber.ev.getSource()).isSameAs(mixinAddAlias);
+//            // assertThat(subscriber.ev.getSource()).isSameAs(mixinClassify);
 //
 //            assertThat(subscriber.ev.getSource().getClassifiable()).isSameAs(classifiable);
 //            assertThat(subscriber.ev.getArguments().get(0)).isEqualTo(randomAtPath);

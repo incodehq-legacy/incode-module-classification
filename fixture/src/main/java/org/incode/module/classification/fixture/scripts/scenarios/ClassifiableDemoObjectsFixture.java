@@ -21,7 +21,7 @@ import org.apache.isis.applib.fixturescripts.DiscoverableFixtureScript;
 import org.incode.module.classification.dom.impl.classifiablelink.Object_classify;
 import org.incode.module.classification.dom.impl.classification.Classification;
 import org.incode.module.classification.dom.impl.classification.ClassificationRepository;
-import org.incode.module.classification.fixture.dom.classifiable.ClassifiableDomainObject;
+import org.incode.module.classification.fixture.dom.classifiable.ClassifiableDemoObject;
 import org.incode.module.classification.fixture.dom.classifiable.ClassifiableDomainObjectMenu;
 import org.incode.module.classification.fixture.scripts.teardown.ClassificationDemoAppTearDownFixture;
 
@@ -62,26 +62,26 @@ public class ClassifiableDemoObjectsFixture extends DiscoverableFixtureScript {
         Classification sizeOfMedium = size.newChild("Medium");
         Classification sizeOfLittle = size.newChild("Little");
 
-        colour.applicableTo("/ITA", ClassifiableDomainObject.class);
+        colour.applicableTo("/ITA", ClassifiableDemoObject.class);
 
         // TODO: need to make applicability transitive for all sub-tenancies
-        size.applicableTo("/", ClassifiableDomainObject.class);
-        size.applicableTo("/ITA", ClassifiableDomainObject.class);
+        size.applicableTo("/", ClassifiableDemoObject.class);
+        size.applicableTo("/ITA", ClassifiableDemoObject.class);
 
-        final ClassifiableDomainObject foo = create("Foo", "/ITA", executionContext);
+        final ClassifiableDemoObject foo = create("Foo", "/ITA", executionContext);
         wrap(classify(foo)).$$(colourOfRed, null, null);
         wrap(classify(foo)).$$(sizeOfMedium, null, null);
 
-        final ClassifiableDomainObject bar = create("Bar", "/", executionContext);
+        final ClassifiableDemoObject bar = create("Bar", "/", executionContext);
         wrap(classify(bar)).$$(sizeOfLittle, null, null);
 
-        final ClassifiableDomainObject baz = create("Baz", "/", executionContext);
+        final ClassifiableDemoObject baz = create("Baz", "/", executionContext);
     }
 
 
     // //////////////////////////////////////
 
-    private ClassifiableDomainObject create(
+    private ClassifiableDemoObject create(
             final String name,
             final String atPath,
             final ExecutionContext executionContext) {

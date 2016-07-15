@@ -32,7 +32,7 @@ import org.apache.isis.applib.annotation.NatureOfService;
 import org.apache.isis.applib.annotation.Programmatic;
 
 import org.incode.module.classification.dom.impl.classifiablelink.ClassifiableLink;
-import org.incode.module.classification.fixture.dom.classifiable.ClassifiableDomainObject;
+import org.incode.module.classification.fixture.dom.classifiable.ClassifiableDemoObject;
 
 @javax.jdo.annotations.PersistenceCapable(
         identityType= IdentityType.DATASTORE,
@@ -40,9 +40,9 @@ import org.incode.module.classification.fixture.dom.classifiable.ClassifiableDom
 @javax.jdo.annotations.Inheritance(
         strategy = InheritanceStrategy.NEW_TABLE)
 @DomainObject(
-        objectType = "classificationdemo.ClassifiableLinkForDomainObject"
+        objectType = "classificationdemo.ClassifiableLinkForDemoObject"
 )
-public class ClassifiableLinkForDomainObject extends ClassifiableLink {
+public class ClassifiableLinkForDemoObject extends ClassifiableLink {
 
     //region > instantiationSubscriber, setPolymorphicReference
     @DomainService(nature = NatureOfService.DOMAIN)
@@ -51,8 +51,8 @@ public class ClassifiableLinkForDomainObject extends ClassifiableLink {
         @Programmatic
         @Subscribe
         public void on(final InstantiateEvent ev) {
-            if(ev.getPolymorphicReference() instanceof ClassifiableDomainObject) {
-                ev.setSubtype(ClassifiableLinkForDomainObject.class);
+            if(ev.getPolymorphicReference() instanceof ClassifiableDemoObject) {
+                ev.setSubtype(ClassifiableLinkForDemoObject.class);
             }
         }
     }
@@ -60,23 +60,23 @@ public class ClassifiableLinkForDomainObject extends ClassifiableLink {
     @Override
     public void setPolymorphicReference(final Object polymorphicReference) {
         super.setPolymorphicReference(polymorphicReference);
-        setDomainObject((ClassifiableDomainObject) polymorphicReference);
+        setDemoObject((ClassifiableDemoObject) polymorphicReference);
     }
     //endregion
 
-    //region > domainObject (property)
-    private ClassifiableDomainObject domainObject;
+    //region > demoObject (property)
+    private ClassifiableDemoObject demoObject;
 
     @Column(
             allowsNull = "false",
-            name = "domainObjectId"
+            name = "demoObjectId"
     )
-    public ClassifiableDomainObject getDomainObject() {
-        return domainObject;
+    public ClassifiableDemoObject getDemoObject() {
+        return demoObject;
     }
 
-    public void setDomainObject(final ClassifiableDomainObject domainObject) {
-        this.domainObject = domainObject;
+    public void setDemoObject(final ClassifiableDemoObject demoObject) {
+        this.demoObject = demoObject;
     }
     //endregion
 }

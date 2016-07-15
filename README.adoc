@@ -5,12 +5,14 @@ image:https://travis-ci.org/incodehq/incode-module-classification.png?branch=mas
 
 This module, intended for use with link:http://isis.apache.org[Apache Isis], provides the ability to classify any
 (arbitrary) domain object against a pre-defined set of classifications available for that type of domain object (and
-application tenancy).
+application tenancy).  There are _no_ requirements for those domain objects implement any interfaces.
+A subclass of the `ClassificationLink` abstract class (about 40 lines of boilerplate, details below) is required,
+acting as the "glue" between the classification and the "classifiable" domain object.
 
 
 == Screenshots
 
-NOTE: TODO - need to update from here on...
+NOTE: TODO - incomplete and missing screenshots
 
 The following screenshots show an example app's usage of the module.
 
@@ -18,31 +20,12 @@ We start by installing some demo fixture data:
 
 image::https://raw.githubusercontent.com/incodehq/incode-module-classification/master/images/010-run-fixture-script.png[link="https://raw.githubusercontent.com/incodehq/incode-module-classification/master/images/010-run-fixture-script.png"]
 
-This installs some very simple (demo) `Aliasable` domain objects, the first of which is returned.  The `Aliasable` has
-a (contributed) `aliases` collection, and we can also add new aliases using a (contributed) `addAlias(...)` action:
+This installs some very simple (demo) "classifiable" domain objects, the first of which is returned.  These classifiable
+domain objects have a (contributed) `classifications` collection, and we can also add new classifications using a
+(contributed) `classify(...)` action:
 
-image::https://raw.githubusercontent.com/incodehq/incode-module-classification/master/images/040-add-alias.png[link="https://raw.githubusercontent.com/incodehq/incode-module-classification/master/images/040-add-alias.png"]
+image::https://raw.githubusercontent.com/incodehq/incode-module-classification/master/images/040-add-alias.png[link="https://raw.githubusercontent.com/incodehq/incode-module-classification/master/images/040-classify.png"]
 
-The action requires the application tenancy of the alias (as returned from the `ApplicationTenancyRepository` SPI service) to be specified:
-
-image::https://raw.githubusercontent.com/incodehq/incode-module-classification/master/images/050-enter-alias-details.png[link="https://raw.githubusercontent.com/incodehq/incode-module-classification/master/images/050-enter-alias-details.png"]
-
-and also the alias type (as returned from the `AliasTypeRepository` SPI service) to be specified:
-
-image::https://raw.githubusercontent.com/incodehq/incode-module-classification/master/images/052-enter-alias-details.png[link="https://raw.githubusercontent.com/incodehq/incode-module-classification/master/images/052-enter-alias-details.png"]
-
-and finally the external alias reference itself must be specified also:
-
-image::https://raw.githubusercontent.com/incodehq/incode-module-classification/master/images/054-enter-alias-details.png[link="https://raw.githubusercontent.com/incodehq/incode-module-classification/master/images/054-enter-alias-details.png"]
-
-
-The aliases for the `Alias` domain object is added to:
-
-image::https://raw.githubusercontent.com/incodehq/incode-module-classification/master/images/060-alias_added_to_collection.png[link="https://raw.githubusercontent.com/incodehq/incode-module-classification/master/images/060-alias_added_to_collection.png"]
-
-Each `Alias` can also be viewed:
-
-image::https://raw.githubusercontent.com/incodehq/incode-module-classification/master/images/070-view-alias.png[link="https://raw.githubusercontent.com/incodehq/incode-module-classification/master/images/070-view-alias.png"]
 
 
 
@@ -57,7 +40,7 @@ To build the demo app:
 
 [source]
 ----
-git clone https://github.com/incodehq/isis-module-alias.git
+git clone https://github.com/incodehq/isis-module-classification.git
 mvn clean install
 ----
 
@@ -69,6 +52,56 @@ mvn antrun:run -P self-host
 ----
 
 Then log on using user: `sven`, password: `pass`
+
+
+
+== Domain Model
+
+The following `yuml.me` class diagram highlights the main concepts:
+
+image::http://yuml.me/b04335f4[link="http://yuml.me/b04335f4"]
+
+(The colours used in the diagram are - approximately - from link:https://en.wikipedia.org/wiki/Object_Modeling_in_Color[Object Modeling in Color].
+
+
+=== `Classification`
+
+The `Classification` entity defines a hierarchy of classifications (another term might be "taxonomy").  In many cases
+this will be only two levels deep, in effect defining a enum, eg:
+
+* `Color` root classification, with children:
+** `Color/RED`
+** `Color/GREEN`
+** `Color/RED`
+
+However, deeper hierarchies are possible, eg:
+
+* `Size`
+** `Size/SMALL`
+*** `Size/SMALL/Smallest`
+*** `Size/SMALL/Smaller`
+*** `Size/SMALL/Small`
+** `Size/MEDIUM`
+** `Size/LARGE`
+*** `Size/LARGE/Large`
+*** `Size/LARGE/Larger`
+*** `Size/LARGE/Largest`
+
+There can be many such classification hierarchies; a given domain object can have multiple classifications, one per
+hierarchy (but not more than one classification per hierarchy).  Thus, a domain object might be classified as both
+`Color/RED` and `Size/MEDIUM`, but it isn't possible to classify as both `Color/RED` and `Color/GREEN`.
+
+=== `Applicability` and `ApplicationTenancyRepository`
+
+Not every domain object can be classified with respect to every hierarchy.  Instead, the available set is restricted by
+the `Applicability` entity.  This identifies which ``Classification``(s) can be associated with domain object types.
+This is further qualified by the application tenancy of the domain object (for multi-tenanted applications).  The
+`ApplicationTenancyRepository` SPI service is used to obtain the application tenancy of each domain object.
+
+=== `ClassifiableLink`
+
+The `ClassifiableLink` is the tuple that represents the classification of the domain object.  Classifications can
+optionally be specified to run over a period of time.
 
 
 == How to configure/use
@@ -86,30 +119,23 @@ To use "out-of-the-box":
 <dependency>
     <groupId>org.incode.module.classification</groupId>
     <artifactId>incode-module-classification-dom</artifactId>
-    <version>1.12.0</version>
+    <version>1.13.0</version>
 </dependency>
 ----
 
-* if using `AppManifest`, then update its `getModules()` method:
-
-    @Override
-    public List<Class<?>> getModules() {
-        return Arrays.asList(
-                ...
-                org.incode.module.classification.dom.ClassificationModule.class,
-        );
-    }
-
-
-* alternatively, in your project's `webapp` module, update your `WEB-INF/isis.properties`. +
+* in the `AppManifest`, update its `getModules()` method: +
 +
-[source,xml]
+[source,java]
 ----
-  isis.services.ServicesInstallerFromAnnotation.packagePrefix=\
-                                ...\
-                                org.incode.module.classification.dom,\
-                                ...
+@Override
+public List<Class<?>> getModules() {
+    return Arrays.asList(
+            ...
+            org.incode.module.classification.dom.ClassificationModule.class,
+    );
+}
 ----
+
 
 
 
@@ -126,7 +152,7 @@ If you want to use the current `-SNAPSHOT`, then the steps are the same as above
 
 [source,xml]
 ----
-<version>1.13.0-SNAPSHOT</version>
+<version>1.14.0-SNAPSHOT</version>
 ----
 
 * add the repository definition to pick up the most recent snapshot (we use the Cloudbees continuous integration service).  We suggest defining the repository in a `<profile>`:
@@ -156,39 +182,21 @@ If you want to use the current `-SNAPSHOT`, then the steps are the same as above
 
 === For each domain object...
 
-For each domain object that you want to be able to add aliases, you need to implement the `Aliasable` marker interface
-and (optionally but strongly recommended) implement a subclass of `AliasableLink` to hold a type-safe reference back to
-the domain object.
+For each domain object that you want to classify (that is, to add classifications), you need to:
 
-For each such `Aliasable` domain object, the module will then:
-
-* contribute the `aliases` collection, and
-
-* contribute the `addAlias(...)` and `removeAlias(...)` actions.
-
-Other than implementing the marker interface, the `Aliasable` domain object will be completely decoupled from the rest
-of the alias module.
-
-In detail:
-
-* have the domain object implement the `Aliasable` interface: +
+* implement a subclass of `ClassificationLink` for the domain object's type. +
 +
-For example, in the demo app the `AliasDemoObject` implements this interface: +
-+
-[source,java]
-----
-public class AliasDemoObject implements Aliasable {
-    ...
-}
-----
-+
-This is a marker interface only (no methods need be implemented); it is used only so that Apache Isis knows where to
-contribute the collections and actions.
+This link acts as a type-safe tuple linking the domain object to the `Classification`.
 
-* subclass the `AliasableLink` abstract class and also implement a domain event subscriber to correctly instantiate
-the subclass.
+* implement a domain event subscriber to correctly instantiate the subclass. +
++
+Typically this is a nested static class of the `ClassificationLink` subtype.
 
-For example, in the demo app the `AliasableLinkForDemoObject` implements both of these responsibilities:
+For each such "classifiable" domain object, the module contribute the `classifications` collection, and also
+contributes the `classify(...)` and `unclassify(...)` actions.
+
+For example, in the demo app the `ClassifiableDemoObject` can be classified by virtue of the
+`ClassifiableLinkForDemoObject` subclass:
 
 [source,java]
 ----
@@ -197,9 +205,9 @@ For example, in the demo app the `AliasableLinkForDemoObject` implements both of
         schema="classificationdemo")
 @javax.jdo.annotations.Inheritance(strategy = InheritanceStrategy.NEW_TABLE)
 @DomainObject(
-        objectType = "classificationdemo.AliasableLinkForDemoObject"
+        objectType = "classificationdemo.ClassifiableLinkForDemoObject"
 )
-public class AliasableLinkForDemoObject extends AliasableLink {                  // <1>
+public class ClassifiableLinkForDemoObject extends ClassifiableLink {            // <1>
 
     @DomainService(nature = NatureOfService.DOMAIN)
     @DomainServiceLayout(menuOrder = "1")
@@ -207,81 +215,60 @@ public class AliasableLinkForDemoObject extends AliasableLink {                 
         @Programmatic
         @Subscribe
         public void on(final InstantiateEvent ev) {
-            if(ev.getPolymorphicReference() instanceof AliasDemoObject) {
-                ev.setSubtype(AliasableLinkForDemoObject.class);
+            if(ev.getPolymorphicReference() instanceof ClassifiableDemoObject) {
+                ev.setSubtype(ClassifiableLinkForDemoObject.class);
             }
         }
     }
 
     @Override
-    public void setPolymorphicReference(final Aliasable polymorphicReference) {  // <3>
+    public void setPolymorphicReference(final Object polymorphicReference) {    // <3>
         super.setPolymorphicReference(polymorphicReference);
-        setDemoObject((AliasDemoObject) polymorphicReference);
+        setDemoObject((ClassifiableDemoObject) polymorphicReference);
     }
 
-    private AliasDemoObject domainObject;
+    private ClassifiableDemoObject demoObject;
     @Column(
             allowsNull = "false",
             name = "demoObjectId"
     )
-    public AliasDemoObject getDemoObject() {                                     // <4>
-        return domainObject;
+    public ClassifiableDemoObject getDemoObject() {                                     // <4>
+        return demoObject;
     }
-    public void setDemoObject(final AliasDemoObject domainObject) {
-        this.domainObject = domainObject;
+    public void setDemoObject(final ClassifiableDemoObject demoObject) {
+        this.demoObject = demoObject;
     }
 }
 ----
-<1> extend from `AliasableLink`
-<2> implementation of a domain event subscriber that tells the `incode-module-classification` which subclass of `AliasableLink` to instantiate to handle the polymorphic link between `Alias` and the `Aliasable`.
-<3> override the inherited `setPolymorphicReference(...)` method to allow the type-safe reference property to the `Aliasable` (in this case `AliasDemoObject`) to be set
-<4> the type-safe reference property to the `Aliasable` (in this case `AliasDemoObject`).  In the RDBMS this will correspond to a regular foreign key with referential integrity constraints correctly applied.
+<1> extend from `ClassifiableLink`
+<2> implementation of a domain event subscriber that tells the `incode-module-classification` which subclass of
+`ClassificationLink` to instantiate to handle the polymorphic link between `Classification` and the "classifiable"
+domain object
+<3> override the inherited `setPolymorphicReference(...)` method to allow the type-safe reference property to the
+"classifiable" (in this case `ClassifiableDemoObject`) to be set
+<4> the type-safe reference property to the "classifiable" domain object (in this case `ClassifiableDemoObject`).  In
+the RDBMS this will correspond to a regular foreign key with referential integrity constraints correctly applied.
+
+
 
 
 
 === SPI services
 
-There are two mandatory SPI domain services that must be implemented.
-
-First, the `ApplicationTenancyRepository` returns the application tenancy (path)s for a given aliased:
+There is one mandatory SPI domain service that must be implemented, namely the `ApplicationTenancyRepository`.  This
+returns the application tenancy (path)s for a given classifiable object:
 
 [source,java]
 ----
 public interface ApplicationTenancyRepository {
-    Collection<String> atPathsFor(final Aliasable aliased);
+    Collection<String> atPathsFor(final Object classifiable);
 }
 ----
 
-Second, the `AliasTypeRepository` interface returns the available alias types for a given application tenancy path and
-aliased:
 
-[source,java]
-----
-public interface AliasTypeRepository {
-    Collection<AliasType> aliasTypesFor(final Aliasable aliased, final String atPath);
-}
-----
-
-where `AliasType` is defined as the interface:
-[source,java]
-----
-public interface AliasType {
-    String getId();
-}
-----
-Typically `AliasType` will be implemented as an entity or perhaps a view model.  The "id" is used as a column in
-the database tables, but in the UI the end-user sees the title of the object that implements the interface.
-
-[WARNING]
-====
-Currently (as of v1.11.1) the Apache Isis framework does not support enums implementing interfaces; the example app
-shows how a view model can be used as a work-around.
-====
-
-
-Note that there can be multiple implementations of either of these interfaces.  This is to support the use case that
-different unrelated entities in the application may implement `Aliasable`; each such `Aliasable` implementation can
- have its own supporting implementations.
+There can be multiple implementations of this interface.  This is to support the use case that different unrelated
+entities in the application may be classifiable; each such classifiable implementation can have its own supporting
+implementations of this SPI interface.
 
 
 
@@ -290,15 +277,14 @@ different unrelated entities in the application may implement `Aliasable`; each 
 
 The module provides the following domain services for querying aliases:
 
-* `AliasRepository` +
+* `ClassificationRepository` +
 +
-To search for aliases by `Aliasable`
+To search for existing ``Classification``s, and to create top-level ``Classification``s.  Children are created from
+`Classification` itself.
 
-* `AliasableLinkRepository` +
+* `ClassificationLinkRepository` +
 +
-To search for ``AliasableLink``s, ie the tuple that links an `Alias` with an arbitrary `Aliasable` domain object.
-This repository allows for links to be searched by either aliased, or application tenancy path, or alias type, in
-any combination.
+To search for ``ClassificationLink``s, ie the tuple that links an `Classification` with an arbitrary "classifiable" domain object.  This repository allows for links to be searched by classifiable and optionally by date.
 
 
 
@@ -308,8 +294,7 @@ None at this time.
 
 == Change Log
 
-* `1.12.0` - released against Isis 1.12.0
-* `1.11.1` - released against Isis 1.11.1.
+* `1.13.0` - released against Isis 1.13.0
 
 
 
@@ -359,14 +344,13 @@ under the License.
 Depends upon:
 
 * http://github.com/isisaddons/isis-module-poly[Isis addons' poly] module
-* http://github.com/isisaddons/isis-wicket-fullcalendar2[Isis addons' fullcalendar2] wicket extension
 
-both released under Apache v2 license.
+released under Apache v2 license.
 
 
 === Icons
 
-The icon for the `Alias` entity is provided by https://icons8.com/[Icons8].
+The icons are provided by https://icons8.com/[Icons8].
 
 
 ==  Maven deploy notes

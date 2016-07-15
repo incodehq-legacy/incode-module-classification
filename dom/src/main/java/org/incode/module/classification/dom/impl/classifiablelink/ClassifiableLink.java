@@ -37,7 +37,6 @@ import org.apache.isis.applib.services.i18n.TranslatableString;
 import org.isisaddons.module.poly.dom.PolymorphicAssociationLink;
 
 import org.incode.module.classification.dom.ClassificationModule;
-import org.incode.module.classification.dom.api.classifiable.Classifiable;
 import org.incode.module.classification.dom.impl.classification.Classification;
 
 import lombok.Getter;
@@ -279,10 +278,10 @@ public abstract class ClassifiableLink
                                 ? (T) input.getClassification()
                                 : null;
         }
-        public static Function<ClassifiableLink, Classifiable> classifiable() {
-            return classifiable(Classifiable.class);
+        public static Function<ClassifiableLink, Object> classifiable() {
+            return classifiable(Object.class);
         }
-        public static <T extends Classifiable> Function<ClassifiableLink, T> classifiable(final Class<T> cls) {
+        public static <T> Function<ClassifiableLink, T> classifiable(final Class<T> cls) {
             return input -> input != null
                                 ? (T)input.getClassifiable()
                                 : null;

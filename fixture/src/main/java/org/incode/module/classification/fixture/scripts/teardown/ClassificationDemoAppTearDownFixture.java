@@ -23,12 +23,12 @@ public class ClassificationDemoAppTearDownFixture extends FixtureScript {
 
     @Override
     protected void execute(final ExecutionContext executionContext) {
-        isisJdoSupport.executeUpdate("delete from \"classificationdemo\".\"ClassifiableLinkForDomainObject\"");
-        isisJdoSupport.executeUpdate("delete from \"classificationdemo\".\"ClassifiableDomainObject\"");
+        isisJdoSupport.executeUpdate("delete from \"classificationdemo\".\"ClassifiableLinkForDemoObject\"");
+        isisJdoSupport.executeUpdate("delete from \"classificationdemo\".\"ClassifiableDemoObject\"");
 
+        isisJdoSupport.executeUpdate("delete from \"incodeClassification\".\"ClassifiableLink\"");
         isisJdoSupport.executeUpdate("delete from \"incodeClassification\".\"Applicability\"");
         isisJdoSupport.executeUpdate("delete from \"incodeClassification\".\"Classification\"");
-        isisJdoSupport.executeUpdate("delete from \"incodeClassification\".\"ClassifiableLink\"");
     }
 
 

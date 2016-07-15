@@ -24,12 +24,12 @@ import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 
-import org.incode.module.classification.fixture.dom.classifiable.ClassifiableDomainObject;
+import org.incode.module.classification.fixture.dom.classifiable.ClassifiableDemoObject;
 import org.incode.module.classification.fixture.dom.classifiable.ClassifiableDomainObjectMenu;
 import org.incode.module.classification.fixture.scripts.scenarios.ClassifiableDemoObjectsFixture;
 import org.incode.module.classification.integtests.ClassificationModuleIntegTest;
 
-public class ClassifiableDomainObjectMenuTest extends ClassificationModuleIntegTest {
+public class ClassifiableDemoObjectMenuTest extends ClassificationModuleIntegTest {
 
     @Inject
     ClassifiableDomainObjectMenu classifiableDomainObjectMenu;
@@ -42,11 +42,11 @@ public class ClassifiableDomainObjectMenuTest extends ClassificationModuleIntegT
     @Test
     public void listAll() throws Exception {
 
-        final List<ClassifiableDomainObject> all = wrap(classifiableDomainObjectMenu).listAll();
+        final List<ClassifiableDemoObject> all = wrap(classifiableDomainObjectMenu).listAll();
         Assertions.assertThat(all.size()).isEqualTo(3);
         
-        ClassifiableDomainObject classifiableDomainObject = wrap(all.get(0));
-        Assertions.assertThat(classifiableDomainObject.getName()).isEqualTo("Foo");
+        ClassifiableDemoObject classifiableDemoObject = wrap(all.get(0));
+        Assertions.assertThat(classifiableDemoObject.getName()).isEqualTo("Foo");
     }
     
     @Test
@@ -54,7 +54,7 @@ public class ClassifiableDomainObjectMenuTest extends ClassificationModuleIntegT
 
         wrap(classifiableDomainObjectMenu).create("Faz", "/");
         
-        final List<ClassifiableDomainObject> all = wrap(classifiableDomainObjectMenu).listAll();
+        final List<ClassifiableDemoObject> all = wrap(classifiableDomainObjectMenu).listAll();
         Assertions.assertThat(all.size()).isEqualTo(4);
     }
 

@@ -36,15 +36,15 @@ import org.apache.isis.applib.util.ObjectContracts;
         strategy=VersionStrategy.VERSION_NUMBER, 
         column="version")
 @DomainObject(
-        objectType = "classificationdemo.ClassifiableDomainObject",
+        objectType = "classificationdemo.ClassifiableDemoObject",
         editing = Editing.DISABLED
 )
 @DomainObjectLayout(
         bookmarking = BookmarkPolicy.AS_ROOT
 )
-public class ClassifiableDomainObject implements Comparable<ClassifiableDomainObject> {
+public class ClassifiableDemoObject implements Comparable<ClassifiableDemoObject> {
 
-    public ClassifiableDomainObject(final String name, final String atPath) {
+    public ClassifiableDemoObject(final String name, final String atPath) {
         setName(name);
         setAtPath(atPath);
     }
@@ -88,7 +88,7 @@ public class ClassifiableDomainObject implements Comparable<ClassifiableDomainOb
     }
 
     @Override
-    public int compareTo(final ClassifiableDomainObject other) {
+    public int compareTo(final ClassifiableDemoObject other) {
         return ObjectContracts.compare(this, other, "name");
     }
 
