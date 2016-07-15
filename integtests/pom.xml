@@ -25,7 +25,7 @@ Copyright 2016 Dan Haywood
     </parent>
 
     <artifactId>incode-module-classification-integtests</artifactId>
-    <name>Incode Classification Module IntegTests</name>
+    <name>Incode Module Classification IntegTests</name>
 
     <build>
         <testResources>

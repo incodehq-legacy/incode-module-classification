@@ -38,7 +38,7 @@ import org.apache.isis.applib.annotation.Mixin;
 import org.apache.isis.applib.annotation.ParameterLayout;
 import org.apache.isis.applib.annotation.SemanticsOf;
 
-import org.incode.module.classification.dom.api.classifiable.Classifiable;
+import org.incode.module.classification.dom.ClassificationModule;
 import org.incode.module.classification.dom.impl.applicability.Applicability;
 import org.incode.module.classification.dom.impl.applicability.ApplicabilityRepository;
 import org.incode.module.classification.dom.impl.classification.Classification;
@@ -68,8 +68,10 @@ public class Object_classify {
 
     //endregion
 
+    //region > $$
 
-    public static class DomainEvent extends Classifiable.ActionDomainEvent<Object_classify> { }
+
+    public static class DomainEvent extends ClassificationModule.ActionDomainEvent<Object_classify> { }
 
     @Action(
             domainEvent = DomainEvent.class,

@@ -24,7 +24,7 @@ Copyright 2016 Dan Haywood
     </parent>
 
 	<artifactId>incode-module-classification-fixture</artifactId>
-    <name>Incode Classification Module Fixtures</name>
+    <name>Incode Module Classification Fixtures</name>
 
 	<build>
         <resources>

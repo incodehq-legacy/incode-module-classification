@@ -27,7 +27,7 @@
     </parent>
 
     <artifactId>incode-module-classification-app</artifactId>
-    <name>Incode Classification Module Application</name>
+    <name>Incode Module Classification Application</name>
 
     <build>
         <resources>

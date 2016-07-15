@@ -29,7 +29,7 @@ import org.apache.isis.applib.annotation.Contributed;
 import org.apache.isis.applib.annotation.Mixin;
 import org.apache.isis.applib.annotation.SemanticsOf;
 
-import org.incode.module.classification.dom.api.classifiable.Classifiable;
+import org.incode.module.classification.dom.ClassificationModule;
 
 @Mixin
 public class Object_classificationLinks {
@@ -50,7 +50,9 @@ public class Object_classificationLinks {
     }
     //endregion
 
-    public static class DomainEvent extends Classifiable.ActionDomainEvent<Object_classificationLinks> { } { }
+    //region > $$
+
+    public static class DomainEvent extends ClassificationModule.ActionDomainEvent<Object_classificationLinks> { } { }
     @Action(
             domainEvent = DomainEvent.class,
             semantics = SemanticsOf.SAFE
@@ -69,5 +71,8 @@ public class Object_classificationLinks {
     public boolean hide$$() {
         return !classifiableLinkRepository.supports(classifiable);
     }
+
+    //endregion
+
 
 }

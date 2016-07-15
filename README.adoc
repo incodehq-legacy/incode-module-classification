@@ -243,22 +243,22 @@ public class AliasableLinkForDemoObject extends AliasableLink {                 
 
 There are two mandatory SPI domain services that must be implemented.
 
-First, the `ApplicationTenancyRepository` returns the application tenancy (path)s for a given aliasable:
+First, the `ApplicationTenancyRepository` returns the application tenancy (path)s for a given aliased:
 
 [source,java]
 ----
 public interface ApplicationTenancyRepository {
-    Collection<String> atPathsFor(final Aliasable aliasable);
+    Collection<String> atPathsFor(final Aliasable aliased);
 }
 ----
 
 Second, the `AliasTypeRepository` interface returns the available alias types for a given application tenancy path and
-aliasable:
+aliased:
 
 [source,java]
 ----
 public interface AliasTypeRepository {
-    Collection<AliasType> aliasTypesFor(final Aliasable aliasable, final String atPath);
+    Collection<AliasType> aliasTypesFor(final Aliasable aliased, final String atPath);
 }
 ----
 
@@ -297,7 +297,7 @@ To search for aliases by `Aliasable`
 * `AliasableLinkRepository` +
 +
 To search for ``AliasableLink``s, ie the tuple that links an `Alias` with an arbitrary `Aliasable` domain object.
-This repository allows for links to be searched by either aliasable, or application tenancy path, or alias type, in
+This repository allows for links to be searched by either aliased, or application tenancy path, or alias type, in
 any combination.
 
 

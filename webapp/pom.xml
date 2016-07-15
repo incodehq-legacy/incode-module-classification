@@ -24,7 +24,7 @@ language governing permissions and limitations under the License.
     </parent>
 
     <artifactId>incode-module-classification-webapp</artifactId>
-    <name>Incode Classification Module Webapp</name>
+    <name>Incode Module Classification Webapp</name>
 
     <packaging>war</packaging>
 

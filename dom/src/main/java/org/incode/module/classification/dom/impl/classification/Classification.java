@@ -15,6 +15,7 @@ import javax.jdo.annotations.VersionStrategy;
 import com.google.common.collect.Sets;
 
 import org.apache.isis.applib.annotation.Action;
+import org.apache.isis.applib.annotation.ActionLayout;
 import org.apache.isis.applib.annotation.Collection;
 import org.apache.isis.applib.annotation.DomainObject;
 import org.apache.isis.applib.annotation.Editing;
@@ -157,6 +158,9 @@ public class Classification implements Comparable<Classification> {
     private SortedSet<Classification> children = new TreeSet<>();
 
     @Action()
+    @ActionLayout(
+            cssClassFa = "fa-plus"
+    )
     @MemberOrder(name = "children", sequence = "1")
     public Classification newChild(@ParameterLayout(named="Name") final String localName) {
         Classification classification = new Classification(this, localName, true);
@@ -171,6 +175,9 @@ public class Classification implements Comparable<Classification> {
     }
 
     @Action(semantics = SemanticsOf.IDEMPOTENT_ARE_YOU_SURE)
+    @ActionLayout(
+            cssClassFa = "fa-minus"
+    )
     @MemberOrder(name = "children", sequence = "2")
     public Classification remove(final Classification classification) {
         removeCascade(classification);
@@ -197,6 +204,9 @@ public class Classification implements Comparable<Classification> {
 
 
     @Action()
+    @ActionLayout(
+            cssClassFa = "fa-plus"
+    )
     @MemberOrder(name = "applicabilities", sequence = "1")
     public Classification applicableTo(final String atPath, final Class<?> domainType) {
         String domainTypeName = domainType.getName();
@@ -215,6 +225,9 @@ public class Classification implements Comparable<Classification> {
     }
 
     @Action(semantics = SemanticsOf.IDEMPOTENT_ARE_YOU_SURE)
+    @ActionLayout(
+            cssClassFa = "fa-minus"
+    )
     @MemberOrder(name = "applicabilities", sequence = "2")
     public Classification noLongerApplicable(final Applicability applicability) {
         repositoryService.remove(applicability);
