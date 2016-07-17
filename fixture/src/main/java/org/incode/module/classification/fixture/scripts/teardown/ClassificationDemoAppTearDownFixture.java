@@ -28,7 +28,7 @@ public class ClassificationDemoAppTearDownFixture extends FixtureScript {
 
         isisJdoSupport.executeUpdate("delete from \"incodeClassification\".\"Classification\"");
         isisJdoSupport.executeUpdate("delete from \"incodeClassification\".\"Applicability\"");
-        isisJdoSupport.executeUpdate("delete from \"incodeClassification\".\"Classification\"");
+        isisJdoSupport.executeUpdate("delete from \"incodeClassification\".\"Category\"");
     }
 
 

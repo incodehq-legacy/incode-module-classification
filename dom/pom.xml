@@ -59,7 +59,6 @@ Copyright 2016 Dan Haywood
         <compileTarget>1.8</compileTarget>
 
         <isis.version>1.13.0</isis.version>
-        <isis-module-poly-dom.version>1.13.0</isis-module-poly-dom.version>
         <isis-module-fakedata-dom.version>1.13.0</isis-module-fakedata-dom.version>
 
         <lombok.version>1.16.6</lombok.version>
@@ -226,11 +225,6 @@ Copyright 2016 Dan Haywood
             <groupId>org.apache.isis.core</groupId>
             <artifactId>isis-core-applib</artifactId>
             <version>${isis.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.isisaddons.module.poly</groupId>
-            <artifactId>isis-module-poly-dom</artifactId>
-            <version>${isis-module-poly-dom.version}</version>
         </dependency>
         <dependency>
             <groupId>org.isisaddons.module.fakedata</groupId>
