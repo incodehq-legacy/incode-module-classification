@@ -1,210 +1,233 @@
+/*
+ *  Licensed to the Apache Software Foundation (ASF) under one
+ *  or more contributor license agreements.  See the NOTICE file
+ *  distributed with this work for additional information
+ *  regarding copyright ownership.  The ASF licenses this file
+ *  to you under the Apache License, Version 2.0 (the
+ *  "License"); you may not use this file except in compliance
+ *  with the License.  You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an
+ *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  KIND, either express or implied.  See the License for the
+ *  specific language governing permissions and limitations
+ *  under the License.
+ */
 package org.incode.module.classification.dom.impl.classification;
 
-import java.util.Objects;
-import java.util.Optional;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
-import javax.inject.Inject;
-import javax.jdo.annotations.Column;
-import javax.jdo.annotations.DiscriminatorStrategy;
-import javax.jdo.annotations.IdGeneratorStrategy;
-import javax.jdo.annotations.IdentityType;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.VersionStrategy;
-
-import org.apache.isis.applib.annotation.Action;
-import org.apache.isis.applib.annotation.ActionLayout;
-import org.apache.isis.applib.annotation.Collection;
-import org.apache.isis.applib.annotation.DomainObject;
-import org.apache.isis.applib.annotation.Editing;
-import org.apache.isis.applib.annotation.MemberOrder;
-import org.apache.isis.applib.annotation.ParameterLayout;
-import org.apache.isis.applib.annotation.Property;
-import org.apache.isis.applib.annotation.SemanticsOf;
-import org.apache.isis.applib.annotation.Title;
-import org.apache.isis.applib.services.repository.RepositoryService;
-import org.apache.isis.applib.services.title.TitleService;
-import org.apache.isis.applib.util.ObjectContracts;
-
-import org.incode.module.classification.dom.ClassificationModule;
-import org.incode.module.classification.dom.impl.classifiablelink.ClassifiableLinkRepository;
-
+import com.google.common.eventbus.Subscribe;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.isis.applib.AbstractSubscriber;
+import org.apache.isis.applib.annotation.*;
+import org.apache.isis.applib.services.title.TitleService;
+import org.apache.isis.applib.util.ObjectContracts;
+import org.incode.module.classification.dom.ClassificationModule;
+import org.incode.module.classification.dom.impl.category.Category;
+import org.incode.module.classification.dom.impl.category.taxonomy.Taxonomy;
+
+import javax.inject.Inject;
+import javax.jdo.annotations.IdGeneratorStrategy;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.InheritanceStrategy;
 
 @javax.jdo.annotations.PersistenceCapable(
+        identityType=IdentityType.DATASTORE,
         schema = "incodeClassification",
-        table = "Classification",
-        identityType = IdentityType.DATASTORE)
-@javax.jdo.annotations.DatastoreIdentity(
-        strategy = IdGeneratorStrategy.NATIVE,
-        column = "id")
-@javax.jdo.annotations.Version(
-        strategy = VersionStrategy.VERSION_NUMBER,
-        column = "version")
-@javax.jdo.annotations.Discriminator(strategy = DiscriminatorStrategy.CLASS_NAME) // can just check if has a parent
+        table = "Classification"
+)
+@javax.jdo.annotations.DatastoreIdentity(strategy = IdGeneratorStrategy.IDENTITY, column = "id")
+@javax.jdo.annotations.Inheritance(
+        strategy = InheritanceStrategy.NEW_TABLE)
 @javax.jdo.annotations.Queries({
         @javax.jdo.annotations.Query(
-                name = "findByFullyQualifiedName", language = "JDOQL",
+                name = "findByTaxonomy", language = "JDOQL",
                 value = "SELECT "
                         + "FROM org.incode.module.classification.dom.impl.classification.Classification "
-                        + "WHERE fullyQualifiedName == :fullyQualifiedName"),
+                        + "WHERE taxonomy == :taxonomy "
+                        + "ORDER BY classifiedStr"),
         @javax.jdo.annotations.Query(
-                name = "findByParent", language = "JDOQL",
+                name = "findByClassified", language = "JDOQL",
                 value = "SELECT "
                         + "FROM org.incode.module.classification.dom.impl.classification.Classification "
-                        + "WHERE parent == :parent"),
-        @javax.jdo.annotations.Query(
-                name = "findByParentAndLocalName", language = "JDOQL",
-                value = "SELECT "
-                        + "FROM org.incode.module.classification.dom.impl.classification.Classification "
-                        + "WHERE parent == :parent "
-                        + "&&    localName == :localName "),
+                        + "WHERE classifiedStr == :classifiedStr "
+                        + "ORDER BY taxonomy, category")
+})
+@javax.jdo.annotations.Indices({
+        @javax.jdo.annotations.Index(
+                name = "ClassificationLink_category_classified_IDX",
+                members = { "category", "classifiedStr" }
+        ),
+        @javax.jdo.annotations.Index(
+                name = "ClassificationLink_category_classified_IDX",
+                members = { "taxonomy", "classifiedStr" }
+        )
 })
 @javax.jdo.annotations.Uniques({
         @javax.jdo.annotations.Unique(
-                name="Classification_fullyQualifiedName_UNQ",
-                members = { "fullyQualifiedName" }),
-        @javax.jdo.annotations.Unique(
-                name="Classification_parent_localName_UNQ",
-                members = { "parent", "localName" })
+                name = "ClassificationLink_classified_category_UNQ",
+                members = { "classifiedStr", "taxonomy" }
+        )
 })
 @DomainObject(
-        editing = Editing.DISABLED
+        objectType = "incodeClassification.Classification"
 )
-public class Classification implements Comparable<Classification> {
+@DomainObjectLayout(
+        titleUiEvent = Classification.TitleUiEvent.class,
+        iconUiEvent = Classification.IconUiEvent.class,
+        cssClassUiEvent = Classification.CssClassUiEvent.class
+)
+public abstract class Classification implements Comparable<Classification> {
 
-    //region > constructor
-    Classification(final Classification parent, final String name) {
-        setParent(parent);
-        setLocalName(name);
-
-        deriveFullyQualifiedName();
-    }
-
-    private void deriveFullyQualifiedName() {
-        StringBuilder buf = new StringBuilder();
-        prependName(this, buf);
-        setFullyQualifiedName(buf.toString());
-    }
-
-    private static void prependName(Classification classification, final StringBuilder buf) {
-        while(classification != null) {
-            prependLocalNameOf(classification, buf);
-            classification = classification.getParent();
-        }
-    }
-
-    private static void prependLocalNameOf(final Classification classification, final StringBuilder buf) {
-        if(buf.length() > 0) {
-            buf.insert(0, "/");
-        }
-        buf.insert(0, classification.getLocalName());
-    }
+    //region > ui event classes
+    public static class TitleUiEvent extends ClassificationModule.TitleUiEvent<Classification>{}
+    public static class IconUiEvent extends ClassificationModule.IconUiEvent<Classification>{}
+    public static class CssClassUiEvent extends ClassificationModule.CssClassUiEvent<Classification>{}
     //endregion
 
     //region > event classes
-    public static abstract class PropertyDomainEvent<S,T> extends ClassificationModule.PropertyDomainEvent<S, T> { }
-    public static abstract class CollectionDomainEvent<S,T> extends ClassificationModule.CollectionDomainEvent<S, T> { }
-    public static abstract class ActionDomainEvent<S> extends ClassificationModule.ActionDomainEvent<S> { }
+    public static abstract class PropertyDomainEvent<T> extends ClassificationModule.PropertyDomainEvent<Classification, T> { }
+    public static abstract class CollectionDomainEvent<T> extends ClassificationModule.CollectionDomainEvent<Classification, T> { }
+    public static abstract class ActionDomainEvent extends ClassificationModule.ActionDomainEvent<Classification> { }
     //endregion
 
-    public static class FullyQualifiedNameDomainEvent extends PropertyDomainEvent<Classification,String> { }
-    @Title
-    @Getter @Setter
-    @javax.jdo.annotations.Column(allowsNull = "false", length = ClassificationModule.JdoColumnLength.FULLY_QUALIFIED_NAME)
-    @Property(domainEvent = FullyQualifiedNameDomainEvent.class)
-    private String fullyQualifiedName;
-
-
-    public static class ParentDomainEvent extends PropertyDomainEvent<Classification,Classification> { }
-    @Column(allowsNull = "true")
-    @Property(domainEvent = ParentDomainEvent.class)
-    @Getter @Setter
-    private Classification parent;
-
-
-    public static class LocalNameDomainEvent extends PropertyDomainEvent<Classification,String> { }
-    @Getter @Setter
-    @javax.jdo.annotations.Column(allowsNull = "false", length = ClassificationModule.JdoColumnLength.LOCAL_NAME)
-    @Property(domainEvent = LocalNameDomainEvent.class)
-    private String localName;
-
-
-    @Persistent(mappedBy = "parent", dependentElement = "false")
-    @Collection()
-    @Getter @Setter
-    private SortedSet<Classification> children = new TreeSet<>();
-
-    @Action()
-    @ActionLayout(
-            cssClassFa = "fa-plus",
-            named = "Add"
-    )
-    @MemberOrder(name = "children", sequence = "1")
-    public Classification addChild(@ParameterLayout(named="Name") final String localName) {
-        Classification classification = new Classification(this, localName);
-        repositoryService.persistAndFlush(classification);
-        return classification;
-    }
-
-    public String validate0AddChild(final String localName) {
-        final Optional<Classification> any =
-                getChildren().stream().filter(x -> Objects.equals(x.getLocalName(), localName)).findAny();
-        return any.isPresent() ? "There is already a child classification with the name of '" + localName + "'": null;
-    }
-
-    @Action(semantics = SemanticsOf.IDEMPOTENT_ARE_YOU_SURE)
-    @ActionLayout(
-            cssClassFa = "fa-minus",
-            named = "Add"
-    )
-    @MemberOrder(name = "children", sequence = "2")
-    public Classification removeChild(final Classification classification) {
-        removeCascade(classification);
-        return this;
-    }
-
-    public java.util.Collection<Classification> choices0RemoveChild() {
-        return getChildren();
-    }
-
-    private void removeCascade(final Classification classification) {
-        SortedSet<Classification> children = classification.getChildren();
-        for (Classification child : children) {
-            removeCascade(child);
+    //region > title, icon, cssClass
+    /**
+     * Implemented as a subscriber so can be overridden by consuming application if required.
+     */
+    @DomainService(nature = NatureOfService.DOMAIN)
+    public static class TitleSubscriber extends AbstractSubscriber {
+        @Subscribe
+        public void on(Classification.TitleUiEvent ev) {
+            if(ev.getTitle() != null) {
+                return;
+            }
+            ev.setTitle(titleOf(ev.getSource()));
         }
-        repositoryService.remove(classification);
+        private String titleOf(final Classification classification) {
+            return String.format("%s: %s",
+                            titleService.titleOf(classification.getClassified()),
+                            titleService.titleOf(classification.getCategory()));
+        }
+        @Inject
+        TitleService titleService;
     }
 
+    /**
+     * Implemented as a subscriber so can be overridden by consuming application if required.
+     */
+    @DomainService
+    public static class IconSubscriber extends AbstractSubscriber {
+        @Subscribe
+        public void on(Classification.IconUiEvent ev) {
+            if(ev.getIconName() != null) {
+                return;
+            }
+            ev.setIconName("");
+        }
+    }
+
+    /**
+     * Implemented as a subscriber so can be overridden by consuming application if required.
+     */
+    @DomainService
+    public static class CssClassSubscriber extends AbstractSubscriber {
+        @Subscribe
+        public void on(Classification.CssClassUiEvent ev) {
+            if(ev.getCssClass() != null) {
+                return;
+            }
+            ev.setCssClass("");
+        }
+    }
+    //endregion
 
 
+    //region > classifiedStr (property)
+    public static class ClassifiedStrDomainEvent extends PropertyDomainEvent<String> { }
+    @Getter @Setter
+    @javax.jdo.annotations.Column(allowsNull = "false", length = ClassificationModule.JdoColumnLength.BOOKMARK)
+    @Property(
+            domainEvent = ClassifiedStrDomainEvent.class,
+            editing = Editing.DISABLED
+    )
+    private String classifiedStr;
+    //endregion
+
+    //region > classified (derived property, hooks)
+    /**
+     * Polymorphic association to the aliased object.
+     */
+    @Programmatic
+    public abstract Object getClassified();
+    protected abstract void setClassified(Object object);
+    //endregion
+
+
+    //region > taxonomy (property, derived but persisted)
+    public static class TaxonomyDomainEvent extends PropertyDomainEvent<Taxonomy> { }
+
+    /**
+     * The owning {@link Taxonomy} of the {@link #getCategory() category}.
+     */
+    @Getter @Setter
+    @javax.jdo.annotations.Column(allowsNull = "false", name = "taxonomyId")
+    @Property(
+            domainEvent = TaxonomyDomainEvent.class,
+            editing = Editing.DISABLED
+    )
+    private Taxonomy taxonomy;
+    //endregion
+
+    //region > category (property)
+    public static class CategoryDomainEvent extends PropertyDomainEvent<Category> { }
+    @Getter @Setter
+    @javax.jdo.annotations.Column(allowsNull = "false", name = "categoryId")
+    @Property(
+            domainEvent = CategoryDomainEvent.class,
+            editing = Editing.DISABLED
+    )
+    private Category category;
+    //endregion
+
+
+    //region > remove (action)
+    public static class RemoveDomainEvent extends ActionDomainEvent { }
+    @Action(
+            domainEvent = RemoveDomainEvent.class,
+            semantics = SemanticsOf.IDEMPOTENT_ARE_YOU_SURE
+    )
+    @ActionLayout(
+            cssClass = "btn-warning",
+            cssClassFa = "trash"
+    )
+    public Object remove() {
+        final Object aliased = getClassified();
+        classificationRepository.remove(this);
+        return aliased;
+    }
+
+    //endregion
 
     //region > toString, compareTo
 
     @Override
     public String toString() {
-        return ObjectContracts.toString(this, "fullyQualifiedName");
+        return ObjectContracts.toString(this, "reference", "atPath", "aliasTypeId");
     }
 
     @Override
     public int compareTo(final Classification other) {
-        return ObjectContracts.compare(this, other, "fullyQualifiedName");
+        return ObjectContracts.compare(this, other, "reference", "atPath", "aliasTypeId");
     }
 
     //endregion
 
     //region > injected services
-
     @Inject
-    ClassifiableLinkRepository classifiableLinkRepository;
-    @Inject
-    TitleService titleService;
-    @Inject
-    RepositoryService repositoryService;
-
+    ClassificationRepository classificationRepository;
     //endregion
-
-
 }

@@ -14,29 +14,21 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.incode.module.classification.fixture.dom.classifiable;
+package org.incode.module.classification.fixture.dom.demo;
+
+import org.apache.isis.applib.annotation.*;
+import org.apache.isis.applib.services.repository.RepositoryService;
 
 import java.util.List;
 
-import org.apache.isis.applib.annotation.Action;
-import org.apache.isis.applib.annotation.ActionLayout;
-import org.apache.isis.applib.annotation.BookmarkPolicy;
-import org.apache.isis.applib.annotation.DomainService;
-import org.apache.isis.applib.annotation.DomainServiceLayout;
-import org.apache.isis.applib.annotation.MemberOrder;
-import org.apache.isis.applib.annotation.NatureOfService;
-import org.apache.isis.applib.annotation.ParameterLayout;
-import org.apache.isis.applib.annotation.SemanticsOf;
-import org.apache.isis.applib.services.repository.RepositoryService;
-
 @DomainService(
         nature = NatureOfService.VIEW,
-        repositoryFor = ClassifiableDemoObject.class
+        repositoryFor = DemoObject.class
 )
 @DomainServiceLayout(
         menuOrder = "10"
 )
-public class ClassifiableDomainObjectMenu {
+public class DemoObjectMenu {
 
 
     //region > listAll (action)
@@ -48,8 +40,8 @@ public class ClassifiableDomainObjectMenu {
             bookmarking = BookmarkPolicy.AS_ROOT
     )
     @MemberOrder(sequence = "1")
-    public List<ClassifiableDemoObject> listAll() {
-        return repositoryService.allInstances(ClassifiableDemoObject.class);
+    public List<DemoObject> listAll() {
+        return repositoryService.allInstances(DemoObject.class);
     }
 
     //endregion
@@ -57,12 +49,12 @@ public class ClassifiableDomainObjectMenu {
     //region > createTopLevel (action)
     
     @MemberOrder(sequence = "2")
-    public ClassifiableDemoObject create(
+    public DemoObject create(
             @ParameterLayout(named = "Name")
             final String name,
             @ParameterLayout(named = "Application tenancy")
             final String atPath) {
-        final ClassifiableDemoObject obj = new ClassifiableDemoObject(name, atPath);
+        final DemoObject obj = new DemoObject(name, atPath);
         repositoryService.persist(obj);
         return obj;
     }

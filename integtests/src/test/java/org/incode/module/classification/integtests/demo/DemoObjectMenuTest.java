@@ -16,45 +16,43 @@
  */
 package org.incode.module.classification.integtests.demo;
 
-import java.util.List;
-
-import javax.inject.Inject;
-
 import org.assertj.core.api.Assertions;
+import org.incode.module.classification.fixture.dom.demo.DemoObject;
+import org.incode.module.classification.fixture.dom.demo.DemoObjectMenu;
+import org.incode.module.classification.fixture.scripts.scenarios.ClassifiedDemoObjectsFixture;
+import org.incode.module.classification.integtests.ClassificationModuleIntegTest;
 import org.junit.Before;
 import org.junit.Test;
 
-import org.incode.module.classification.fixture.dom.classifiable.ClassifiableDemoObject;
-import org.incode.module.classification.fixture.dom.classifiable.ClassifiableDomainObjectMenu;
-import org.incode.module.classification.fixture.scripts.scenarios.ClassifiableDemoObjectsFixture;
-import org.incode.module.classification.integtests.ClassificationModuleIntegTest;
+import javax.inject.Inject;
+import java.util.List;
 
-public class ClassifiableDemoObjectMenuTest extends ClassificationModuleIntegTest {
+public class DemoObjectMenuTest extends ClassificationModuleIntegTest {
 
     @Inject
-    ClassifiableDomainObjectMenu classifiableDomainObjectMenu;
+    DemoObjectMenu demoObjectMenu;
 
     @Before
     public void setUpData() throws Exception {
-        fixtureScripts.runFixtureScript(new ClassifiableDemoObjectsFixture(), null);
+        fixtureScripts.runFixtureScript(new ClassifiedDemoObjectsFixture(), null);
     }
 
     @Test
     public void listAll() throws Exception {
 
-        final List<ClassifiableDemoObject> all = wrap(classifiableDomainObjectMenu).listAll();
+        final List<DemoObject> all = wrap(demoObjectMenu).listAll();
         Assertions.assertThat(all.size()).isEqualTo(3);
         
-        ClassifiableDemoObject classifiableDemoObject = wrap(all.get(0));
-        Assertions.assertThat(classifiableDemoObject.getName()).isEqualTo("Foo");
+        DemoObject demoObject = wrap(all.get(0));
+        Assertions.assertThat(demoObject.getName()).isEqualTo("Foo");
     }
     
     @Test
     public void create() throws Exception {
 
-        wrap(classifiableDomainObjectMenu).create("Faz", "/");
+        wrap(demoObjectMenu).create("Faz", "/");
         
-        final List<ClassifiableDemoObject> all = wrap(classifiableDomainObjectMenu).listAll();
+        final List<DemoObject> all = wrap(demoObjectMenu).listAll();
         Assertions.assertThat(all.size()).isEqualTo(4);
     }
 

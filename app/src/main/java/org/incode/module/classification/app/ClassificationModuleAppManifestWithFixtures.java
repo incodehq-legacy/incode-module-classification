@@ -27,7 +27,7 @@ import com.google.common.collect.Maps;
 
 import org.apache.isis.applib.fixturescripts.FixtureScript;
 
-import org.incode.module.classification.fixture.scripts.scenarios.ClassifiableDemoObjectsFixture;
+import org.incode.module.classification.fixture.scripts.scenarios.ClassifiedDemoObjectsFixture;
 
 /**
  * Run the app but without setting up any fixtures.
@@ -39,7 +39,7 @@ public class ClassificationModuleAppManifestWithFixtures extends ClassificationM
      */
     @Override
     public List<Class<? extends FixtureScript>> getFixtures() {
-        return Lists.newArrayList(ClassifiableDemoObjectsFixture.class);
+        return Lists.newArrayList(ClassifiedDemoObjectsFixture.class);
     }
 
     /**

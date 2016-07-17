@@ -12,10 +12,11 @@
                     <bs3:row>
                         <bs3:col span="12">
                             <cpt:fieldSet name="Name" id="general" unreferencedProperties="true">
+                                <cpt:property id="taxonomy" hidden="EVERYWHERE"/>
                                 <cpt:property id="fullyQualifiedName" hidden="EVERYWHERE"/>
-                                <cpt:property id="parent"  hidden="REFERENCES_PARENT"/>
-                                <cpt:property id="localName"/>
-                                <cpt:property id="selectable" hidden="ALL_TABLES"/>
+                                <cpt:property id="parent" hidden="EVERYWHERE"/>
+                                <cpt:property id="name"/>
+                                <cpt:property id="reference" hidden="EVERYWHERE"/>
                             </cpt:fieldSet>
                         </bs3:col>
                     </bs3:row>
@@ -44,13 +45,6 @@
                     <bs3:row>
                         <bs3:col span="12">
                             <cpt:collection id="applicabilities" defaultView="table"/>
-                        </bs3:col>
-                    </bs3:row>
-                </bs3:tab>
-                <bs3:tab name="Applicable to (Inherited)">
-                    <bs3:row>
-                        <bs3:col span="12">
-                            <cpt:collection id="inheritedApplicabilities" defaultView="table"/>
                         </bs3:col>
                     </bs3:row>
                 </bs3:tab>

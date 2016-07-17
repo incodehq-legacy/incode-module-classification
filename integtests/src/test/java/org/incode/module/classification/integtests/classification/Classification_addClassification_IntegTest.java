@@ -16,22 +16,21 @@
  */
 package org.incode.module.classification.integtests.classification;
 
-import javax.inject.Inject;
-
-import org.junit.Before;
-
-import org.incode.module.classification.dom.spi.ApplicationTenancyRepository;
-import org.incode.module.classification.fixture.dom.classifiable.ClassifiableDomainObjectMenu;
+import org.incode.module.classification.dom.spi.ApplicationTenancyService;
+import org.incode.module.classification.fixture.dom.demo.DemoObjectMenu;
 import org.incode.module.classification.fixture.scripts.teardown.ClassificationDemoAppTearDownFixture;
 import org.incode.module.classification.integtests.ClassificationModuleIntegTest;
+import org.junit.Before;
+
+import javax.inject.Inject;
 
 public class Classification_addClassification_IntegTest extends ClassificationModuleIntegTest {
 
     @Inject
-    ClassifiableDomainObjectMenu classifiableDomainObjectMenu;
+    DemoObjectMenu demoObjectMenu;
 
     @Inject
-    ApplicationTenancyRepository applicationTenancyRepository;
+    ApplicationTenancyService applicationTenancyService;
 
     Object classifiable;
 
@@ -39,7 +38,7 @@ public class Classification_addClassification_IntegTest extends ClassificationMo
     public void setUpData() throws Exception {
         fixtureScripts.runFixtureScript(new ClassificationDemoAppTearDownFixture(), null);
 
-        classifiable = wrap(classifiableDomainObjectMenu).create("Foo", "/");
+        classifiable = wrap(demoObjectMenu).create("Foo", "/");
     }
 
 //    public static class ActionImplementationIntegTest extends Classification_addClassification_IntegTest {
@@ -53,7 +52,7 @@ public class Classification_addClassification_IntegTest extends ClassificationMo
 //        public void can_add_alias() throws Exception {
 //
 //            // when
-//            final Collection<String> atPaths = applicationTenancyRepository.atPathsFor(classifiable);
+//            final Collection<String> atPaths = applicationTenancyService.atPathsFor(classifiable);
 //            final String randomAtPath = fakeData.collections().anyOf(atPaths);
 //
 //            final Collection<AliasType> aliasTypes = aliasTypeRepository.aliasTypesFor(classifiable, randomAtPath);
@@ -71,7 +70,7 @@ public class Classification_addClassification_IntegTest extends ClassificationMo
 //        public void can_add_to_same_ref_to_same_atPath_and_different_aliasTypes() throws Exception {
 //
 //            // when
-//            final Collection<String> atPaths = applicationTenancyRepository.atPathsFor(classifiable);
+//            final Collection<String> atPaths = applicationTenancyService.atPathsFor(classifiable);
 //            final String randomAtPath = fakeData.collections().anyOf(atPaths);
 //
 //            final Collection<AliasType> aliasTypes = aliasTypeRepository.aliasTypesFor(classifiable, randomAtPath);
@@ -93,7 +92,7 @@ public class Classification_addClassification_IntegTest extends ClassificationMo
 //        public void can_add_to_same_ref_to_different_atPaths_and_same_aliasType() throws Exception {
 //
 //            // when
-//            final Collection<String> atPaths = applicationTenancyRepository.atPathsFor(classifiable);
+//            final Collection<String> atPaths = applicationTenancyService.atPathsFor(classifiable);
 //            final String randomAtPath = fakeData.collections().anyOf(atPaths);
 //            final String randomAtPath2 = fakeData.collections().anyOfExcept(
 //                    atPaths, atPath -> Objects.equals(atPath, randomAtPath));
@@ -116,7 +115,7 @@ public class Classification_addClassification_IntegTest extends ClassificationMo
 //            expectedException.expectCause(of(SQLIntegrityConstraintViolationException.class));
 //
 //            // given
-//            final Collection<String> atPaths = applicationTenancyRepository.atPathsFor(classifiable);
+//            final Collection<String> atPaths = applicationTenancyService.atPathsFor(classifiable);
 //            final String randomAtPath = fakeData.collections().anyOf(atPaths);
 //
 //            final Collection<AliasType> aliasTypes = aliasTypeRepository.aliasTypesFor(classifiable, randomAtPath);
@@ -139,7 +138,7 @@ public class Classification_addClassification_IntegTest extends ClassificationMo
 //            expectedException.expectCause(of(SQLIntegrityConstraintViolationException.class));
 //
 //            // when
-//            final Collection<String> atPaths = applicationTenancyRepository.atPathsFor(classifiable);
+//            final Collection<String> atPaths = applicationTenancyService.atPathsFor(classifiable);
 //            final String randomAtPath = fakeData.collections().anyOf(atPaths);
 //
 //            final Collection<AliasType> aliasTypes = aliasTypeRepository.aliasTypesFor(classifiable, randomAtPath);
@@ -163,10 +162,10 @@ public class Classification_addClassification_IntegTest extends ClassificationMo
 //        @DomainService(nature = NatureOfService.DOMAIN)
 //        public static class Subscriber extends AbstractSubscriber {
 //
-//            Object_classify.DomainEvent ev;
+//            T_classify.DomainEvent ev;
 //
 //            @Subscribe
-//            public void on(Object_classify.DomainEvent ev) {
+//            public void on(T_classify.DomainEvent ev) {
 //                this.ev = ev;
 //            }
 //        }
@@ -181,14 +180,14 @@ public class Classification_addClassification_IntegTest extends ClassificationMo
 //            assertThat(wrap(classificationLinksOf(classifiable)).$$()).isEmpty();
 //
 //            // when
-//            final Collection<String> atPaths = applicationTenancyRepository.atPathsFor(classifiable);
+//            final Collection<String> atPaths = applicationTenancyService.atPathsFor(classifiable);
 //            final String randomAtPath = fakeData.collections().anyOf(atPaths);
 //
 //            final Collection<AliasType> aliasTypes = aliasTypeRepository.aliasTypesFor(classifiable, randomAtPath);
 //            final AliasType randomAliasType = fakeData.collections().anyOf(aliasTypes);
 //            final String randomAliasRef = fakeData.strings().fixed(10);
 //
-//            final Object_classify mixinClassify = mixinClassify(classifiable);
+//            final T_classify mixinClassify = mixinClassify(classifiable);
 //            wrap(mixinClassify).$$(randomAtPath, randomAliasType, randomAliasRef);
 //
 //            // then
@@ -199,7 +198,7 @@ public class Classification_addClassification_IntegTest extends ClassificationMo
 //            // the source of the event.
 //            // assertThat(subscriber.ev.getSource()).isSameAs(mixinClassify);
 //
-//            assertThat(subscriber.ev.getSource().getClassifiable()).isSameAs(classifiable);
+//            assertThat(subscriber.ev.getSource().getClassified()).isSameAs(classifiable);
 //            assertThat(subscriber.ev.getArguments().get(0)).isEqualTo(randomAtPath);
 //            assertThat(subscriber.ev.getArguments().get(1)).isEqualTo(randomAliasType);
 //            assertThat(subscriber.ev.getArguments().get(2)).isEqualTo(randomAliasRef);

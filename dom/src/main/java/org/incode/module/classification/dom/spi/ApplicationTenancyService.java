@@ -18,13 +18,11 @@
  */
 package org.incode.module.classification.dom.spi;
 
-import java.util.Collection;
-
 /**
- * Mandatory SPI service that returns the application tenancy (path)s for a given classifiable object.
+ * Mandatory SPI service that returns the application tenancy path for a domain object to be classified
  */
-public interface ApplicationTenancyRepository {
+public interface ApplicationTenancyService {
 
-    Collection<String> atPathsFor(final Object classifiable);
+    String atPathFor(final Object domainObjectToClassify);
 
 }

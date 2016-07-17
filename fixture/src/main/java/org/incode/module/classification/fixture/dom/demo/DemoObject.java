@@ -14,7 +14,7 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.incode.module.classification.fixture.dom.classifiable;
+package org.incode.module.classification.fixture.dom.demo;
 
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.VersionStrategy;
@@ -36,15 +36,15 @@ import org.apache.isis.applib.util.ObjectContracts;
         strategy=VersionStrategy.VERSION_NUMBER, 
         column="version")
 @DomainObject(
-        objectType = "classificationdemo.ClassifiableDemoObject",
+        objectType = "classificationdemo.DemoObject",
         editing = Editing.DISABLED
 )
 @DomainObjectLayout(
         bookmarking = BookmarkPolicy.AS_ROOT
 )
-public class ClassifiableDemoObject implements Comparable<ClassifiableDemoObject> {
+public class DemoObject implements Comparable<DemoObject> {
 
-    public ClassifiableDemoObject(final String name, final String atPath) {
+    public DemoObject(final String name, final String atPath) {
         setName(name);
         setAtPath(atPath);
     }
@@ -88,7 +88,7 @@ public class ClassifiableDemoObject implements Comparable<ClassifiableDemoObject
     }
 
     @Override
-    public int compareTo(final ClassifiableDemoObject other) {
+    public int compareTo(final DemoObject other) {
         return ObjectContracts.compare(this, other, "name");
     }
 

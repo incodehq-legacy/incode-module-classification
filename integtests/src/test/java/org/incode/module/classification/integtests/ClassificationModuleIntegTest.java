@@ -26,6 +26,7 @@ import com.google.common.collect.Lists;
 
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
+import org.incode.module.classification.dom.impl.classification.T_classify;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
@@ -40,9 +41,8 @@ import org.isisaddons.module.fakedata.FakeDataModule;
 import org.isisaddons.module.fakedata.dom.FakeDataService;
 
 import org.incode.module.classification.app.ClassificationModuleAppManifest;
-import org.incode.module.classification.dom.impl.classifiablelink.Object_classify;
-import org.incode.module.classification.dom.impl.classifiablelink.Object_classificationLinks;
-import org.incode.module.classification.dom.impl.classifiablelink.Object_unclassify;
+import org.incode.module.classification.dom.impl.classification.T_classifications;
+import org.incode.module.classification.dom.impl.classification.T_unclassify;
 
 public abstract class ClassificationModuleIntegTest extends IntegrationTestAbstract {
 
@@ -56,15 +56,15 @@ public abstract class ClassificationModuleIntegTest extends IntegrationTestAbstr
     protected FakeDataService fakeData;
 
 
-    protected Object_classify mixinClassify(final Object classifiable) {
-        return mixin(Object_classify.class, classifiable);
+    protected T_classify mixinClassify(final Object classifiable) {
+        return mixin(T_classify.class, classifiable);
     }
-    protected Object_unclassify mixinUnclassify(final Object classifiable) {
-        return mixin(Object_unclassify.class, classifiable);
+    protected T_unclassify mixinUnclassify(final Object classifiable) {
+        return mixin(T_unclassify.class, classifiable);
     }
 
-    protected Object_classificationLinks classificationLinksOf(final Object classifiable) {
-        return mixin(Object_classificationLinks.class, classifiable);
+    protected T_classifications classificationLinksOf(final Object classifiable) {
+        return mixin(T_classifications.class, classifiable);
     }
 
     protected static <T> List<T> asList(final Iterable<T> iterable) {

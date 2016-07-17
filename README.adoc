@@ -7,7 +7,7 @@ This module, intended for use with link:http://isis.apache.org[Apache Isis], pro
 (arbitrary) domain object against a pre-defined set of classifications available for that type of domain object (and
 application tenancy).  There are _no_ requirements for those domain objects implement any interfaces.
 A subclass of the `ClassificationLink` abstract class (about 40 lines of boilerplate, details below) is required,
-acting as the "glue" between the classification and the "classifiable" domain object.
+acting as the "glue" between the classification and the "classified" domain object.
 
 
 == Screenshots
@@ -20,7 +20,7 @@ We start by installing some demo fixture data:
 
 image::https://raw.githubusercontent.com/incodehq/incode-module-classification/master/images/010-run-fixture-script.png[link="https://raw.githubusercontent.com/incodehq/incode-module-classification/master/images/010-run-fixture-script.png"]
 
-This installs some very simple (demo) "classifiable" domain objects, the first of which is returned.  These classifiable
+This installs some very simple (demo) "classified" domain objects, the first of which is returned.  These classified
 domain objects have a (contributed) `classifications` collection, and we can also add new classifications using a
 (contributed) `classify(...)` action:
 
@@ -59,7 +59,7 @@ Then log on using user: `sven`, password: `pass`
 
 The following `yuml.me` class diagram highlights the main concepts:
 
-image::http://yuml.me/b04335f4[link="http://yuml.me/b04335f4"]
+image::http://yuml.me/2a277faf[link="http://yuml.me/2a277faf"]
 
 (The colours used in the diagram are - approximately - from link:https://en.wikipedia.org/wiki/Object_Modeling_in_Color[Object Modeling in Color].
 
@@ -192,7 +192,7 @@ This link acts as a type-safe tuple linking the domain object to the `Classifica
 +
 Typically this is a nested static class of the `ClassificationLink` subtype.
 
-For each such "classifiable" domain object, the module contribute the `classifications` collection, and also
+For each such "classified" domain object, the module contribute the `classifications` collection, and also
 contributes the `classify(...)` and `unclassify(...)` actions.
 
 For example, in the demo app the `ClassifiableDemoObject` can be classified by virtue of the
@@ -242,11 +242,11 @@ public class ClassifiableLinkForDemoObject extends ClassifiableLink {           
 ----
 <1> extend from `ClassifiableLink`
 <2> implementation of a domain event subscriber that tells the `incode-module-classification` which subclass of
-`ClassificationLink` to instantiate to handle the polymorphic link between `Classification` and the "classifiable"
+`ClassificationLink` to instantiate to handle the polymorphic link between `Classification` and the "classified"
 domain object
 <3> override the inherited `setPolymorphicReference(...)` method to allow the type-safe reference property to the
-"classifiable" (in this case `ClassifiableDemoObject`) to be set
-<4> the type-safe reference property to the "classifiable" domain object (in this case `ClassifiableDemoObject`).  In
+"classified" (in this case `ClassifiableDemoObject`) to be set
+<4> the type-safe reference property to the "classified" domain object (in this case `ClassifiableDemoObject`).  In
 the RDBMS this will correspond to a regular foreign key with referential integrity constraints correctly applied.
 
 
@@ -256,18 +256,18 @@ the RDBMS this will correspond to a regular foreign key with referential integri
 === SPI services
 
 There is one mandatory SPI domain service that must be implemented, namely the `ApplicationTenancyRepository`.  This
-returns the application tenancy (path)s for a given classifiable object:
+returns the application tenancy (path)s for a given classified object:
 
 [source,java]
 ----
 public interface ApplicationTenancyRepository {
-    Collection<String> atPathsFor(final Object classifiable);
+    Collection<String> atPathsFor(final Object classified);
 }
 ----
 
 
 There can be multiple implementations of this interface.  This is to support the use case that different unrelated
-entities in the application may be classifiable; each such classifiable implementation can have its own supporting
+entities in the application may be classified; each such classified implementation can have its own supporting
 implementations of this SPI interface.
 
 
@@ -284,7 +284,7 @@ To search for existing ``Classification``s, and to create top-level ``Classifica
 
 * `ClassificationLinkRepository` +
 +
-To search for ``ClassificationLink``s, ie the tuple that links an `Classification` with an arbitrary "classifiable" domain object.  This repository allows for links to be searched by classifiable and optionally by date.
+To search for ``ClassificationLink``s, ie the tuple that links an `Classification` with an arbitrary "classified" domain object.  This repository allows for links to be searched by classified and optionally by date.
 
 
 

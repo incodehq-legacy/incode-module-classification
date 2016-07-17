@@ -14,21 +14,13 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.incode.module.classification.fixture.dom.classifications;
+package org.incode.module.classification.fixture.dom.category.taxonomy;
+
+import org.apache.isis.applib.annotation.*;
+import org.incode.module.classification.dom.impl.category.Category;
+import org.incode.module.classification.dom.impl.category.CategoryRepository;
 
 import java.util.List;
-
-import org.apache.isis.applib.annotation.Action;
-import org.apache.isis.applib.annotation.ActionLayout;
-import org.apache.isis.applib.annotation.BookmarkPolicy;
-import org.apache.isis.applib.annotation.DomainService;
-import org.apache.isis.applib.annotation.DomainServiceLayout;
-import org.apache.isis.applib.annotation.MemberOrder;
-import org.apache.isis.applib.annotation.NatureOfService;
-import org.apache.isis.applib.annotation.SemanticsOf;
-
-import org.incode.module.classification.dom.impl.classification.Classification;
-import org.incode.module.classification.dom.impl.classification.ClassificationRepository;
 
 @DomainService(
         nature = NatureOfService.VIEW_MENU_ONLY
@@ -42,12 +34,12 @@ public class TaxonomyMenu {
     @Action(semantics = SemanticsOf.SAFE)
     @ActionLayout(bookmarking = BookmarkPolicy.AS_ROOT)
     @MemberOrder(sequence = "1")
-    public List<Classification> listAll() {
-        return classificationRepository.findByParent(null);
+    public List<Category> listAll() {
+        return categoryRepository.findByParent(null);
     }
 
 
     @javax.inject.Inject
-    ClassificationRepository classificationRepository;
+    CategoryRepository categoryRepository;
 
 }

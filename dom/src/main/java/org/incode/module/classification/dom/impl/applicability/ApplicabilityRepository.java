@@ -18,17 +18,15 @@
  */
 package org.incode.module.classification.dom.impl.applicability;
 
-import java.util.List;
-
-import javax.inject.Inject;
-
 import org.apache.isis.applib.annotation.DomainService;
 import org.apache.isis.applib.annotation.NatureOfService;
 import org.apache.isis.applib.annotation.Programmatic;
 import org.apache.isis.applib.query.QueryDefault;
 import org.apache.isis.applib.services.repository.RepositoryService;
 
-import org.incode.module.classification.dom.impl.classification.Taxonomy;
+import javax.inject.Inject;
+import java.util.List;
+
 
 @DomainService(
         nature = NatureOfService.DOMAIN,
@@ -36,26 +34,17 @@ import org.incode.module.classification.dom.impl.classification.Taxonomy;
 )
 public class ApplicabilityRepository {
 
-    //region > findByParentAndLocalName (programmatic)
+    //region > findByDomainTypeAndUnderAtPath (programmatic)
     @Programmatic
-    public List<Applicability> findByDomainTypeAndAtPaths( final Class<?> domainType, final List<String> atPaths) {
+    public List<Applicability> findByDomainTypeAndUnderAtPath(final Class<?> domainType, final String atPath) {
         return repositoryService.allMatches(
                 new QueryDefault<>(Applicability.class,
-                        "findByDomainTypeAndAtPaths",
+                        "findByDomainTypeAndUnderAtPath",
                         "domainType", domainType.getName(),
-                        "atPaths", atPaths));
+                        "atPath", atPath));
     }
     //endregion
 
-    //region > findByTaxonomy (programmatic)
-    @Programmatic
-    public List<Applicability> findByTaxonomy(final Taxonomy taxonomy) {
-        return repositoryService.allMatches(
-                new QueryDefault<>(Applicability.class,
-                        "findByTaxonomy",
-                        "taxonomy", taxonomy));
-    }
-    //endregion
 
     //region > injected
     @Inject
