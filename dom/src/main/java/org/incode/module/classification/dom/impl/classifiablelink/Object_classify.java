@@ -42,6 +42,7 @@ import org.incode.module.classification.dom.ClassificationModule;
 import org.incode.module.classification.dom.impl.applicability.Applicability;
 import org.incode.module.classification.dom.impl.applicability.ApplicabilityRepository;
 import org.incode.module.classification.dom.impl.classification.Classification;
+import org.incode.module.classification.dom.impl.classification.Taxonomy;
 import org.incode.module.classification.dom.spi.ApplicationTenancyRepository;
 
 @Mixin
@@ -82,7 +83,7 @@ public class Object_classify {
     )
     @MemberOrder(name = "classificationLinks", sequence = "1")
     public Object $$(
-            @ParameterLayout(named = "Classification")
+            final Taxonomy taxonomy,
             final Classification classification,
             @Nullable
             @ParameterLayout(named = "Start date")
@@ -94,7 +95,7 @@ public class Object_classify {
         return this.classifiable;
     }
 
-    public Collection<Classification> choices0$$() {
+    public Collection<Taxonomy> choices0$$() {
         SortedSet<Applicability> applicableToClassHierarchy = Sets.newTreeSet();
 
         // first, pull together all the applicabilities for this domain type and all its supertypes.
@@ -102,17 +103,20 @@ public class Object_classify {
         appendDirectApplicabilities(domainType, applicableToClassHierarchy);
 
         // next, obtain the corresponding Classifications of each of these
-        Set<Classification> applicableClassificationsToClassHierarchy =
+        Set<Taxonomy> applicableTaxonomiesToClassHierarchy =
                 applicableToClassHierarchy.stream()
-                .map(Applicability::getClassification)
+                .map(Applicability::getTaxonomy)
                 .distinct()
                 .collect(Collectors.toSet());
 
+        return applicableTaxonomiesToClassHierarchy;
+    }
+
+    public Collection<Classification> choices1$$(final Taxonomy taxonomy) {
+
         // then, obtain all the Classifications available (ie all the children)
         SortedSet<Classification> classifications = Sets.newTreeSet();
-        for (Classification classification : applicableClassificationsToClassHierarchy) {
-            appendChildClassifications(classification, classifications);
-        }
+        appendChildClassifications(taxonomy, classifications);
 
         List<Classification> currentClassifications = classifiableLinkRepository
                 .findByClassifiableAndDate(classifiable, null)
@@ -120,9 +124,9 @@ public class Object_classify {
                 .map(ClassifiableLink::getClassification)
                 .collect(Collectors.toList());
 
-        // finally, only return those that are 'selectable' and not already a classification
+        // finally, only return those that are not top-level
         return classifications.stream()
-                .filter(Classification::isSelectable)
+                .filter(x -> x.getParent() != null)
                 .filter(x -> !currentClassifications.contains(x))
                 .collect(Collectors.toList());
     }

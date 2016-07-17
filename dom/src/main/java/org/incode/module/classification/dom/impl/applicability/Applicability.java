@@ -17,6 +17,7 @@ import org.apache.isis.applib.util.TitleBuffer;
 
 import org.incode.module.classification.dom.ClassificationModule;
 import org.incode.module.classification.dom.impl.classification.Classification;
+import org.incode.module.classification.dom.impl.classification.Taxonomy;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -43,22 +44,22 @@ import lombok.Setter;
                         + "WHERE domainType == :domainType "
                         + "&&    :atPaths.contains(atPath)"),
         @javax.jdo.annotations.Query(
-                name = "findByClassification", language = "JDOQL",
+                name = "findByTaxonomy", language = "JDOQL",
                 value = "SELECT "
                         + "FROM org.incode.module.classification.dom.impl.applicability.Applicability "
-                        + "WHERE classification == :classification "),
+                        + "WHERE taxonomy == :taxonomy "),
 })
 @javax.jdo.annotations.Indices({
         @javax.jdo.annotations.Index(
-                name = "Applicability_domainType_atPath_classification_UNQ",
-                members = { "domainType", "atPath", "classification" },
+                name = "Applicability_domainType_atPath_taxonomy_UNQ",
+                members = { "domainType", "atPath", "taxonomy" },
                 unique = "true"
         ),
 })
 @javax.jdo.annotations.Uniques({
         @javax.jdo.annotations.Unique(
-                name="Applicability_classification_atPath_domainType_UNQ",
-                members = { "classification", "atPath", "domainType" }),
+                name="Applicability_taxonomy_atPath_domainType_UNQ",
+                members = { "taxonomy", "atPath", "domainType" }),
 
 })
 @DomainObject(
@@ -66,13 +67,13 @@ import lombok.Setter;
 )
 public class Applicability implements Comparable<Applicability> {
 
-    public Applicability(final Classification classification, final String atPath, final Class<?> domainType) {
-        this(classification, atPath, domainType.getName());
+    public Applicability(final Taxonomy taxonomy, final String atPath, final Class<?> domainType) {
+        this(taxonomy, atPath, domainType.getName());
     }
 
-    public Applicability(final Classification classification, final String atPath, final String domainTypeName) {
+    public Applicability(final Taxonomy taxonomy, final String atPath, final String domainTypeName) {
         setAtPath(atPath);
-        setClassification(classification);
+        setTaxonomy(taxonomy);
         setDomainType(domainTypeName);
     }
 
@@ -89,7 +90,7 @@ public class Applicability implements Comparable<Applicability> {
         buf.append(" [");
         buf.append(getAtPath());
         buf.append("]: ");
-        buf.append(titleService.titleOf(getClassification()));
+        buf.append(titleService.titleOf(getTaxonomy()));
         return buf.toString();
     }
 
@@ -102,12 +103,12 @@ public class Applicability implements Comparable<Applicability> {
 
     public static class ClassificationDomainEvent extends PropertyDomainEvent<Applicability,String> { }
     @Getter @Setter
-    @javax.jdo.annotations.Column(allowsNull = "false")
+    @javax.jdo.annotations.Column(allowsNull = "false", name = "taxonomyId")
     @Property(
             domainEvent = ClassificationDomainEvent.class,
             editing = Editing.DISABLED
     )
-    private Classification classification;
+    private Taxonomy taxonomy;
 
 
     public static class AtPathDomainEvent extends Applicability.PropertyDomainEvent<Applicability,String> { }
@@ -136,7 +137,7 @@ public class Applicability implements Comparable<Applicability> {
 
     public final static class Functions {
         private Functions() {}
-        public final static Function<Applicability, Classification> GET_CLASSIFICATION = input -> input.getClassification();
+        public final static Function<Applicability, Classification> GET_TAXONOMY = input -> input.getTaxonomy();
         public final static Function<Applicability, String> GET_AT_PATH = input -> input.getAtPath();
         public final static Function<Applicability, String> GET_DOMAIN_TYPE = input -> input.getDomainType();
     }
@@ -146,12 +147,12 @@ public class Applicability implements Comparable<Applicability> {
 
     @Override
     public String toString() {
-        return ObjectContracts.toString(this, "classification", "atPath", "domainType");
+        return ObjectContracts.toString(this, "taxonomy", "atPath", "domainType");
     }
 
     @Override
     public int compareTo(final Applicability other) {
-        return ObjectContracts.compare(this, other, "classification", "atPath", "domainType");
+        return ObjectContracts.compare(this, other, "taxonomy", "atPath", "domainType");
     }
 
     //endregion

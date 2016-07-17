@@ -31,21 +31,20 @@ import org.incode.module.classification.dom.impl.classification.Classification;
 import org.incode.module.classification.dom.impl.classification.ClassificationRepository;
 
 @DomainService(
-        nature = NatureOfService.VIEW
+        nature = NatureOfService.VIEW_MENU_ONLY
 )
 @DomainServiceLayout(
         menuOrder = "10"
 )
-public class ClassificationsMenu {
+public class TaxonomyMenu {
 
 
     @Action(semantics = SemanticsOf.SAFE)
     @ActionLayout(bookmarking = BookmarkPolicy.AS_ROOT)
     @MemberOrder(sequence = "1")
-    public List<Classification> topLevel() {
+    public List<Classification> listAll() {
         return classificationRepository.findByParent(null);
     }
-
 
 
     @javax.inject.Inject

@@ -28,7 +28,7 @@ import org.apache.isis.applib.annotation.Programmatic;
 import org.apache.isis.applib.query.QueryDefault;
 import org.apache.isis.applib.services.repository.RepositoryService;
 
-import org.incode.module.classification.dom.impl.classification.Classification;
+import org.incode.module.classification.dom.impl.classification.Taxonomy;
 
 @DomainService(
         nature = NatureOfService.DOMAIN,
@@ -47,13 +47,13 @@ public class ApplicabilityRepository {
     }
     //endregion
 
-    //region > findByClassification (programmatic)
+    //region > findByTaxonomy (programmatic)
     @Programmatic
-    public List<Applicability> findByClassification(final Classification classification) {
+    public List<Applicability> findByTaxonomy(final Taxonomy taxonomy) {
         return repositoryService.allMatches(
                 new QueryDefault<>(Applicability.class,
-                        "findByClassification",
-                        "classification", classification));
+                        "findByTaxonomy",
+                        "taxonomy", taxonomy));
     }
     //endregion
 

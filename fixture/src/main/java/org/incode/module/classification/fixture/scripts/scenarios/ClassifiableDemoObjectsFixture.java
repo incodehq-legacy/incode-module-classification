@@ -21,6 +21,7 @@ import org.apache.isis.applib.fixturescripts.DiscoverableFixtureScript;
 import org.incode.module.classification.dom.impl.classifiablelink.Object_classify;
 import org.incode.module.classification.dom.impl.classification.Classification;
 import org.incode.module.classification.dom.impl.classification.ClassificationRepository;
+import org.incode.module.classification.dom.impl.classification.Taxonomy;
 import org.incode.module.classification.fixture.dom.classifiable.ClassifiableDemoObject;
 import org.incode.module.classification.fixture.dom.classifiable.ClassifiableDomainObjectMenu;
 import org.incode.module.classification.fixture.scripts.teardown.ClassificationDemoAppTearDownFixture;
@@ -52,28 +53,34 @@ public class ClassifiableDemoObjectsFixture extends DiscoverableFixtureScript {
         // prereqs
         executionContext.executeChild(this, new ClassificationDemoAppTearDownFixture());
 
-        Classification colour = classificationRepository.createTopLevel("Colour");
-        Classification colourOfRed = colour.newChild("Red");
-        Classification colourOfGreen = colour.newChild("Green");
-        Classification colourOfBlue = colour.newChild("Blue");
+        Taxonomy colourTaxonomy = classificationRepository.createTaxonomy("Colour");
+        Classification colourOfRed = colourTaxonomy.addChild("Red");
+        Classification colourOfGreen = colourTaxonomy.addChild("Green");
+        Classification colourOfBlue = colourTaxonomy.addChild("Blue");
 
-        Classification size = classificationRepository.createTopLevel("Size");
-        Classification sizeOfBig = size.newChild("Big");
-        Classification sizeOfMedium = size.newChild("Medium");
-        Classification sizeOfLittle = size.newChild("Little");
+        Taxonomy sizeTaxonomy = classificationRepository.createTaxonomy("Size");
+        Classification large = sizeTaxonomy.addChild("Large");
+        Classification largeLarge = large.addChild("Large");
+        Classification largeLarger = large.addChild("Larger");
+        Classification largeLargest = large.addChild("Largest");
+        Classification medium = sizeTaxonomy.addChild("Medium");
+        Classification small = sizeTaxonomy.addChild("Small");
+        Classification smallSmall = small.addChild("Small");
+        Classification smallSmaller = small.addChild("Smaller");
+        Classification smallSmallest = small.addChild("Smallest");
 
-        colour.applicableTo("/ITA", ClassifiableDemoObject.class);
+        colourTaxonomy.applicableTo("/ITA", ClassifiableDemoObject.class);
 
         // TODO: need to make applicability transitive for all sub-tenancies
-        size.applicableTo("/", ClassifiableDemoObject.class);
-        size.applicableTo("/ITA", ClassifiableDemoObject.class);
+        sizeTaxonomy.applicableTo("/", ClassifiableDemoObject.class);
+        sizeTaxonomy.applicableTo("/ITA", ClassifiableDemoObject.class);
 
         final ClassifiableDemoObject foo = create("Foo", "/ITA", executionContext);
-        wrap(classify(foo)).$$(colourOfRed, null, null);
-        wrap(classify(foo)).$$(sizeOfMedium, null, null);
+        wrap(classify(foo)).$$(colourTaxonomy, colourOfRed, null, null);
+        wrap(classify(foo)).$$(sizeTaxonomy, medium, null, null);
 
         final ClassifiableDemoObject bar = create("Bar", "/", executionContext);
-        wrap(classify(bar)).$$(sizeOfLittle, null, null);
+        wrap(classify(bar)).$$(sizeTaxonomy, smallSmaller, null, null);
 
         final ClassifiableDemoObject baz = create("Baz", "/", executionContext);
     }

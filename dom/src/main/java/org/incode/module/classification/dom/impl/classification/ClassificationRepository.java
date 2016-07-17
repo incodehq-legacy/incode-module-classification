@@ -66,17 +66,16 @@ public class ClassificationRepository {
     //endregion
 
     @Programmatic
-    public Classification createTopLevel(final String name) {
-        Classification classification = new Classification(name);
-        repositoryService.persistAndFlush(classification);
-        return classification;
+    public Taxonomy createTaxonomy(final String name) {
+        final Taxonomy taxonomy = new Taxonomy(name);
+        repositoryService.persistAndFlush(taxonomy);
+        return taxonomy;
     }
 
 
     //region > injected
     @Inject
     RepositoryService repositoryService;
-
     //endregion
 
 }
