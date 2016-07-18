@@ -5,14 +5,13 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.isis.applib.AbstractSubscriber;
 import org.apache.isis.applib.annotation.*;
-import org.apache.isis.applib.services.title.TitleService;
 import org.apache.isis.applib.util.ObjectContracts;
 import org.apache.isis.applib.util.TitleBuffer;
+import org.axonframework.eventhandling.annotation.EventHandler;
 import org.incode.module.classification.dom.ClassificationModule;
 import org.incode.module.classification.dom.impl.category.Category;
 import org.incode.module.classification.dom.impl.category.taxonomy.Taxonomy;
 
-import javax.inject.Inject;
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.VersionStrategy;
@@ -73,6 +72,7 @@ public class Applicability implements Comparable<Applicability> {
      */
     @DomainService(nature = NatureOfService.DOMAIN)
     public static class TitleSubscriber extends AbstractSubscriber {
+        @EventHandler
         @Subscribe
         public void on(Applicability.TitleUiEvent ev) {
             if(ev.getTitle() != null) {
@@ -86,19 +86,19 @@ public class Applicability implements Comparable<Applicability> {
             buf.append(" [");
             buf.append(applicability.getAtPath());
             buf.append("]: ");
-            buf.append(titleService.titleOf(applicability.getTaxonomy()));
+            // can't use titleService.titleOf(...) if using guava, can't call events within events...
+            buf.append(applicability.getTaxonomy().getName());
             return buf.toString();
         }
         private static String simpleNameOf(final String domainType) {
             int lastDot = domainType.lastIndexOf(".");
             return domainType.substring(lastDot+1);
         }
-        @Inject
-        TitleService titleService;
     }
 
     @DomainService
     public static class IconSubscriber extends AbstractSubscriber {
+        @EventHandler
         @Subscribe
         public void on(Applicability.IconUiEvent ev) {
             if(ev.getIconName() != null) {
@@ -113,6 +113,7 @@ public class Applicability implements Comparable<Applicability> {
      */
     @DomainService
     public static class CssClassSubscriber extends AbstractSubscriber {
+        @EventHandler
         @Subscribe
         public void on(Applicability.CssClassUiEvent ev) {
             if(ev.getCssClass() != null) {

@@ -9,6 +9,7 @@ import org.apache.isis.applib.annotation.Collection;
 import org.apache.isis.applib.services.i18n.TranslatableString;
 import org.apache.isis.applib.services.repository.RepositoryService;
 import org.apache.isis.applib.util.ObjectContracts;
+import org.axonframework.eventhandling.annotation.EventHandler;
 import org.incode.module.classification.dom.ClassificationModule;
 import org.incode.module.classification.dom.impl.category.taxonomy.Taxonomy;
 
@@ -97,6 +98,7 @@ public class Category implements Comparable<Category> {
      */
     @DomainService(nature = NatureOfService.DOMAIN)
     public static class TitleSubscriber extends AbstractSubscriber {
+        @EventHandler
         @Subscribe
         public void on(Category.TitleUiEvent ev) {
             if(ev.getTitle() != null) {
@@ -114,6 +116,7 @@ public class Category implements Comparable<Category> {
 
     @DomainService
     public static class IconSubscriber extends AbstractSubscriber {
+        @EventHandler
         @Subscribe
         public void on(Category.IconUiEvent ev) {
             if(ev.getIconName() != null) {
@@ -128,6 +131,7 @@ public class Category implements Comparable<Category> {
      */
     @DomainService
     public static class CssClassSubscriber extends AbstractSubscriber {
+        @EventHandler
         @Subscribe
         public void on(Category.CssClassUiEvent ev) {
             if(ev.getCssClass() != null) {
@@ -209,7 +213,6 @@ public class Category implements Comparable<Category> {
 
     //region > fullyQualifiedName (derived property, persisted)
     public static class FullyQualifiedNameDomainEvent extends PropertyDomainEvent<String> { }
-    @Title
     @Getter @Setter
     @javax.jdo.annotations.Column(allowsNull = "false", length = ClassificationModule.JdoColumnLength.CATEGORY_FQNAME)
     @Property(

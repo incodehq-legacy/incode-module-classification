@@ -25,6 +25,7 @@ import org.apache.isis.applib.AbstractSubscriber;
 import org.apache.isis.applib.annotation.*;
 import org.apache.isis.applib.services.title.TitleService;
 import org.apache.isis.applib.util.ObjectContracts;
+import org.axonframework.eventhandling.annotation.EventHandler;
 import org.incode.module.classification.dom.ClassificationModule;
 import org.incode.module.classification.dom.impl.category.Category;
 import org.incode.module.classification.dom.impl.category.CategoryRepository;
@@ -103,6 +104,7 @@ public abstract class Classification implements Comparable<Classification> {
      */
     @DomainService(nature = NatureOfService.DOMAIN)
     public static class TitleSubscriber extends AbstractSubscriber {
+        @EventHandler
         @Subscribe
         public void on(Classification.TitleUiEvent ev) {
             if(ev.getTitle() != null) {
@@ -113,7 +115,9 @@ public abstract class Classification implements Comparable<Classification> {
         private String titleOf(final Classification classification) {
             return String.format("%s: %s",
                             titleService.titleOf(classification.getClassified()),
-                            titleService.titleOf(classification.getCategory()));
+                            // hmm; this fails if using guava, can't call events within events...
+                            // titleService.titleOf(classification.getCategory()));
+                            classification.getCategory().getFullyQualifiedName());
         }
         @Inject
         TitleService titleService;
@@ -124,6 +128,7 @@ public abstract class Classification implements Comparable<Classification> {
      */
     @DomainService
     public static class IconSubscriber extends AbstractSubscriber {
+        @EventHandler
         @Subscribe
         public void on(Classification.IconUiEvent ev) {
             if(ev.getIconName() != null) {
@@ -138,6 +143,7 @@ public abstract class Classification implements Comparable<Classification> {
      */
     @DomainService
     public static class CssClassSubscriber extends AbstractSubscriber {
+        @EventHandler
         @Subscribe
         public void on(Classification.CssClassUiEvent ev) {
             if(ev.getCssClass() != null) {
