@@ -10,6 +10,7 @@ import org.apache.isis.applib.util.ObjectContracts;
 import org.incode.module.classification.dom.ClassificationModule;
 import org.incode.module.classification.dom.impl.category.taxonomy.Taxonomy;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.jdo.annotations.*;
 import java.util.Objects;
@@ -33,29 +34,34 @@ import java.util.TreeSet;
                 name = "findByFullyQualifiedName", language = "JDOQL",
                 value = "SELECT "
                         + "FROM org.incode.module.classification.dom.impl.category.Category "
-                        + "WHERE fullyQualifiedName == :fullyQualifiedName"),
+                        + "WHERE fullyQualifiedName == :fullyQualifiedName "
+                        + "ORDER BY fullyQualifiedOrdinal "),
         @javax.jdo.annotations.Query(
                 name = "findByTaxonomy", language = "JDOQL",
                 value = "SELECT "
                         + "FROM org.incode.module.classification.dom.impl.category.Taxonomy "
-                        + "WHERE taxonomy == :taxonomy"),
+                        + "WHERE taxonomy == :taxonomy "
+                        + "ORDER BY fullyQualifiedOrdinal "),
         @javax.jdo.annotations.Query(
                 name = "findByParent", language = "JDOQL",
                 value = "SELECT "
                         + "FROM org.incode.module.classification.dom.impl.category.Category "
-                        + "WHERE parent == :parent"),
+                        + "WHERE parent == :parent "
+                        + "ORDER BY fullyQualifiedOrdinal "),
         @javax.jdo.annotations.Query(
                 name = "findByParentAndName", language = "JDOQL",
                 value = "SELECT "
                         + "FROM org.incode.module.classification.dom.impl.category.Category "
                         + "WHERE parent == :parent "
-                        + "&&    name == :name "),
+                        + "&&    name == :name "
+                        + "ORDER BY fullyQualifiedOrdinal "),
         @javax.jdo.annotations.Query(
                 name = "findByParentAndReference", language = "JDOQL",
                 value = "SELECT "
                         + "FROM org.incode.module.classification.dom.impl.category.Category "
                         + "WHERE parent == :parent "
-                        + "&&    reference == :reference "),
+                        + "&&    reference == :reference "
+                        + "ORDER BY fullyQualifiedOrdinal "),
 })
 @javax.jdo.annotations.Uniques({
         @javax.jdo.annotations.Unique(
@@ -136,12 +142,20 @@ public class Category implements Comparable<Category> {
 
 
     //region > constructor
-    protected Category(Taxonomy taxonomy, final Category parent, final String name) {
-        setTaxonomy(taxonomy);
+    protected Category(
+            final Category parent,
+            final String name,
+            final String reference,
+            final Integer ordinal) {
+
+        setTaxonomy(parent != null ? parent.getTaxonomy(): null);
         setParent(parent);
         setName(name);
+        setReference(reference);
+        setOrdinal(ordinal != null? ordinal: 0);
 
         deriveFullyQualifiedName();
+        deriveFullyQualifiedOrdinal();
     }
 
     private void deriveFullyQualifiedName() {
@@ -162,6 +176,24 @@ public class Category implements Comparable<Category> {
             buf.insert(0, "/");
         }
         buf.insert(0, category.getName());
+    }
+    private void deriveFullyQualifiedOrdinal() {
+        StringBuilder buf = new StringBuilder();
+        prependOrdinal(this, buf);
+        setFullyQualifiedOrdinal(buf.toString());
+    }
+
+    private static void prependOrdinal(Category category, final StringBuilder buf) {
+        while(category != null) {
+            prependOrdinalOf(category, buf);
+            category = category.getParent();
+        }
+    }
+    private static void prependOrdinalOf(final Category category, final StringBuilder buf) {
+        if(buf.length() > 0) {
+            buf.insert(0, ".");
+        }
+        buf.insert(0, category.getOrdinal());
     }
     //endregion
 
@@ -215,6 +247,27 @@ public class Category implements Comparable<Category> {
     private String reference;
     //endregion
 
+    //region > fullyQualifiedName (derived property, persisted)
+    public static class FullyQualifiedOrdinalDomainEvent extends PropertyDomainEvent<String> { }
+    @Getter @Setter
+    @javax.jdo.annotations.Column(allowsNull = "false", length = ClassificationModule.JdoColumnLength.CATEGORY_FQORDINAL)
+    @Property(domainEvent = FullyQualifiedOrdinalDomainEvent.class)
+    private String fullyQualifiedOrdinal;
+    //endregion
+
+
+    //region > ordinal (property)
+    public static class OrdinalDomainEvent extends PropertyDomainEvent<Integer> { }
+
+    /**
+     * Optional ordinal.
+     */
+    @Getter @Setter
+    @javax.jdo.annotations.Column(allowsNull = "true")
+    @Property(domainEvent = OrdinalDomainEvent.class)
+    private Integer ordinal;
+    //endregion
+
 
     //region > children (property)
     @Persistent(mappedBy = "parent", dependentElement = "false")
@@ -231,8 +284,16 @@ public class Category implements Comparable<Category> {
             named = "Add"
     )
     @MemberOrder(name = "children", sequence = "1")
-    public Category addChild(@ParameterLayout(named="Name") final String localName) {
-        Category category = new Category(taxonomy, this, localName);
+    public Category addChild(
+            @ParameterLayout(named = "Name")
+            final String name,
+            @Nullable
+            @ParameterLayout(named = "Reference")
+            final String reference,
+            @Nullable
+            @ParameterLayout(named = "(Sorting) ordinal")
+            final Integer ordinal) {
+        final Category category = new Category(this, name, reference, ordinal);
         repositoryService.persistAndFlush(category);
         return category;
     }

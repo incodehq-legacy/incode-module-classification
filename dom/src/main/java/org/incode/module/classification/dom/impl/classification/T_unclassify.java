@@ -60,6 +60,11 @@ public abstract class T_unclassify<T> {
         return choices0$$().isEmpty()? TranslatableString.tr("No classifications to delete"): null;
     }
 
+    public Classification default0$$() {
+        List<Classification> classifications = choices0$$();
+        return classifications.size() == 1? classifications.iterator().next(): null;
+    }
+
     public List<Classification> choices0$$() {
         return classificationRepository.findByClassified(this.classified);
     }

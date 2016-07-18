@@ -20,6 +20,7 @@ package org.incode.module.classification.dom.impl.classification;
 
 import com.google.common.collect.Sets;
 import org.apache.isis.applib.annotation.*;
+import org.apache.isis.applib.services.i18n.TranslatableString;
 import org.apache.isis.applib.services.registry.ServiceRegistry;
 import org.incode.module.classification.dom.ClassificationModule;
 import org.incode.module.classification.dom.impl.applicability.Applicability;
@@ -30,10 +31,8 @@ import org.incode.module.classification.dom.impl.category.taxonomy.Taxonomy;
 import org.incode.module.classification.dom.spi.ApplicationTenancyService;
 
 import javax.inject.Inject;
+import java.util.*;
 import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-import java.util.SortedSet;
 import java.util.stream.Collectors;
 
 public abstract class T_classify<T> {
@@ -69,11 +68,23 @@ public abstract class T_classify<T> {
         return classified;
     }
 
+    public TranslatableString disable$$() {
+        return choices0$$().isEmpty()? TranslatableString.tr("There are no classifications that can be added"): null;
+    }
+
+    public Taxonomy default0$$() {
+        Collection<Taxonomy> taxonomies = choices0$$();
+        return taxonomies.size() == 1? taxonomies.iterator().next(): null;
+    }
+
     public Collection<Taxonomy> choices0$$() {
         SortedSet<Applicability> applicableToClassHierarchy = Sets.newTreeSet();
 
         // pull together all the 'Applicability's for this domain type and all its supertypes.
         String atPath = getAtPath();
+        if(atPath == null) {
+            return Collections.emptyList();
+        }
         appendDirectApplicabilities(atPath, classified.getClass(), applicableToClassHierarchy);
 
 
@@ -125,9 +136,16 @@ public abstract class T_classify<T> {
         applicabilities.addAll(applicabilitiesForDomainType);
     }
 
+    public Category default1$$(final Taxonomy taxonomy) {
+        Collection<Category> categories = choices1$$(taxonomy);
+        return categories.size() == 1? categories.iterator().next(): null;
+    }
 
     public Collection<Category> choices1$$(final Taxonomy taxonomy) {
-        return categoryRepository.findByTaxonomy(taxonomy);
+        final List<Category> categories = categoryRepository.findByTaxonomy(taxonomy);
+        return categories.stream()
+                .filter(x -> x.getParent() != null) // exclude top-level taxonomy
+                .collect(Collectors.toList());
     }
 
     //endregion

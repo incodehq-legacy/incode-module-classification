@@ -3,16 +3,16 @@ package org.incode.module.classification.dom.impl.category.taxonomy;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.isis.applib.annotation.*;
+import org.apache.isis.applib.annotation.Collection;
 import org.apache.isis.applib.services.i18n.TranslatableString;
 import org.incode.module.classification.dom.impl.applicability.Applicability;
 import org.incode.module.classification.dom.impl.category.Category;
+import org.incode.module.classification.dom.impl.category.CategoryRepository;
 
+import javax.inject.Inject;
 import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.Persistent;
-import java.util.Objects;
+import java.util.*;
 import java.util.Optional;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 @javax.jdo.annotations.PersistenceCapable
 @javax.jdo.annotations.Inheritance(strategy = InheritanceStrategy.SUPERCLASS_TABLE)
@@ -23,23 +23,33 @@ public class Taxonomy extends Category {
 
     //region > constructor
     public Taxonomy(final String name) {
-        super(null, null, name);
+        super(null, name, null, 1);
+    }
+    //endregion
+
+
+    //region > all (derived collection)
+    public static class AllDomainEvent extends CollectionDomainEvent<Category> { }
+    @javax.jdo.annotations.NotPersistent
+    @Collection(notPersisted = true)
+    public List<Category> getAll() {
+        return categoryRepository.findByTaxonomy(this);
     }
     //endregion
 
     //region > applicabilties (collection)
     public static class ApplicabilitiesDomainEvent extends CollectionDomainEvent<Applicability> { }
-    @Persistent(mappedBy = "taxonomy", dependentElement = "true")
+    @javax.jdo.annotations.Persistent(mappedBy = "taxonomy", dependentElement = "true")
     @Collection(
             domainEvent = ApplicabilitiesDomainEvent.class,
             editing = Editing.DISABLED
     )
     @Getter @Setter
-    private SortedSet<Applicability> applicabilities = new TreeSet<>();
+    private SortedSet<Applicability> appliesTo = new TreeSet<>();
 
     //endregion
 
-    //region > applicableTo (action)
+    //region > applicable (action)
     public static class ApplicableToDomainEvent extends ActionDomainEvent { }
     @Action(
             domainEvent = ApplicableToDomainEvent.class
@@ -47,17 +57,17 @@ public class Taxonomy extends Category {
     @ActionLayout(
             cssClassFa = "fa-plus"
     )
-    @MemberOrder(name = "applicabilities", sequence = "1")
-    public Category applicableTo(final String atPath, final Class<?> domainType) {
+    @MemberOrder(name = "appliesTo", sequence = "1")
+    public Category applicable(final String atPath, final Class<?> domainType) {
         String domainTypeName = domainType.getName();
         Applicability applicability = new Applicability(this, atPath, domainTypeName);
         repositoryService.persistAndFlush(applicability);
         return this;
     }
-    public TranslatableString validateApplicableTo(final String atPath, final Class<?> domainType) {
+    public TranslatableString validateApplicable(final String atPath, final Class<?> domainType) {
         String domainTypeName = domainType.getName();
         final Optional<Applicability> any =
-                getApplicabilities().stream()
+                getAppliesTo().stream()
                         .filter(x -> Objects.equals(x.getAtPath(), atPath) &&
                                 Objects.equals(x.getDomainType(), domainTypeName))
                         .findAny();
@@ -68,27 +78,31 @@ public class Taxonomy extends Category {
                         "domainTypeName", domainTypeName)
                 : null;
     }
-
     //endregion
 
-    //region > noLongerApplicableTo (action)
-    public static class NoLongerApplicableToDomainEvent extends ActionDomainEvent { }
+    //region > notApplicable (action)
+    public static class NotApplicableDomainEvent extends ActionDomainEvent { }
     @Action(
-            domainEvent = NoLongerApplicableToDomainEvent.class,
+            domainEvent = NotApplicableDomainEvent.class,
             semantics = SemanticsOf.IDEMPOTENT_ARE_YOU_SURE
     )
     @ActionLayout(
             cssClassFa = "fa-minus"
     )
-    @MemberOrder(name = "applicabilities", sequence = "2")
-    public Category noLongerApplicable(final Applicability applicability) {
+    @MemberOrder(name = "appliesTo", sequence = "2")
+    public Category notApplicable(final Applicability applicability) {
         repositoryService.remove(applicability);
         return this;
     }
 
-    public SortedSet<Applicability> choices0NoLongerApplicable() {
-        return getApplicabilities();
+    public SortedSet<Applicability> choices0NotApplicable() {
+        return getAppliesTo();
     }
     //endregion
 
+    //region > injected
+    @Inject
+    CategoryRepository categoryRepository;
+    //endregion
 }
+

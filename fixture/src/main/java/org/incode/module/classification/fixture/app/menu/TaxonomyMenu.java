@@ -14,7 +14,7 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.incode.module.classification.fixture.dom.category.taxonomy;
+package org.incode.module.classification.fixture.app.menu;
 
 import org.apache.isis.applib.annotation.*;
 import org.incode.module.classification.dom.impl.category.Category;
@@ -26,6 +26,7 @@ import java.util.List;
         nature = NatureOfService.VIEW_MENU_ONLY
 )
 @DomainServiceLayout(
+        named = "Taxonomies",
         menuOrder = "10"
 )
 public class TaxonomyMenu {

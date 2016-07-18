@@ -14,7 +14,7 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.incode.module.classification.fixture.dom.apptenancy;
+package org.incode.module.classification.fixture.app.spiimpl;
 
 /**
  * In a real (not demo) application this would probably be the isisaddons' security module's <code>ApplicationTenancy</code> entity.

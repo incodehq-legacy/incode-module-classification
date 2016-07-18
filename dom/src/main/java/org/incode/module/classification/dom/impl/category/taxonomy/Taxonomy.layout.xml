@@ -14,9 +14,11 @@
                             <cpt:fieldSet name="Name" id="general" unreferencedProperties="true">
                                 <cpt:property id="taxonomy" hidden="EVERYWHERE"/>
                                 <cpt:property id="fullyQualifiedName" hidden="EVERYWHERE"/>
+                                <cpt:property id="fullyQualifiedOrdinal" hidden="EVERYWHERE"/>
                                 <cpt:property id="parent" hidden="EVERYWHERE"/>
                                 <cpt:property id="name"/>
                                 <cpt:property id="reference" hidden="EVERYWHERE"/>
+                                <cpt:property id="ordinal" hidden="EVERYWHERE"/>
                             </cpt:fieldSet>
                         </bs3:col>
                     </bs3:row>
@@ -35,7 +37,26 @@
             </bs3:tabGroup>
         </bs3:col>
         <bs3:col span="6">
-            <cpt:collection id="children"  defaultView="table"/>
+            <bs3:tabGroup>
+                <bs3:tab name="Children">
+                    <bs3:row>
+                        <bs3:col span="12">
+                            <cpt:collection id="children"  defaultView="table">
+                                <cpt:named>Children (immediate)</cpt:named>
+                            </cpt:collection>
+                        </bs3:col>
+                    </bs3:row>
+                </bs3:tab>
+                <bs3:tab name="All">
+                    <bs3:row>
+                        <bs3:col span="12">
+                            <cpt:collection id="all"  defaultView="table">
+                                <cpt:named>Children (all)</cpt:named>
+                            </cpt:collection>
+                        </bs3:col>
+                    </bs3:row>
+                </bs3:tab>
+            </bs3:tabGroup>
         </bs3:col>
     </bs3:row>
     <bs3:row>

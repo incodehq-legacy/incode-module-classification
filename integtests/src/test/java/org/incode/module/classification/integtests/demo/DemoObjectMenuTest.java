@@ -17,8 +17,8 @@
 package org.incode.module.classification.integtests.demo;
 
 import org.assertj.core.api.Assertions;
-import org.incode.module.classification.fixture.dom.demo.DemoObject;
-import org.incode.module.classification.fixture.dom.demo.DemoObjectMenu;
+import org.incode.module.classification.fixture.dom.demo.first.DemoObject;
+import org.incode.module.classification.fixture.dom.demo.first.DemoObjectMenu;
 import org.incode.module.classification.fixture.scripts.scenarios.ClassifiedDemoObjectsFixture;
 import org.incode.module.classification.integtests.ClassificationModuleIntegTest;
 import org.junit.Before;

@@ -17,7 +17,7 @@
 package org.incode.module.classification.integtests.classification;
 
 import org.incode.module.classification.dom.spi.ApplicationTenancyService;
-import org.incode.module.classification.fixture.dom.demo.DemoObjectMenu;
+import org.incode.module.classification.fixture.dom.demo.first.DemoObjectMenu;
 import org.incode.module.classification.fixture.scripts.teardown.ClassificationDemoAppTearDownFixture;
 import org.incode.module.classification.integtests.ClassificationModuleIntegTest;
 import org.junit.Before;

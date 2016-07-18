@@ -21,19 +21,14 @@ import org.incode.module.classification.dom.impl.category.Category;
 import org.incode.module.classification.dom.impl.category.CategoryRepository;
 import org.incode.module.classification.dom.impl.category.taxonomy.Taxonomy;
 import org.incode.module.classification.dom.impl.classification.T_classify;
-import org.incode.module.classification.fixture.dom.classification.ClassificationForDemoObject;
-import org.incode.module.classification.fixture.dom.demo.DemoObject;
-import org.incode.module.classification.fixture.dom.demo.DemoObjectMenu;
+import org.incode.module.classification.fixture.app.classification.demo.first.ClassificationForDemoObject;
+import org.incode.module.classification.fixture.dom.demo.first.DemoObject;
+import org.incode.module.classification.fixture.dom.demo.first.DemoObjectMenu;
+import org.incode.module.classification.fixture.dom.demo.other.OtherObject;
+import org.incode.module.classification.fixture.dom.demo.other.OtherObjectMenu;
 import org.incode.module.classification.fixture.scripts.teardown.ClassificationDemoAppTearDownFixture;
 
 public class ClassifiedDemoObjectsFixture extends DiscoverableFixtureScript {
-
-    //region > injected services
-    @javax.inject.Inject
-    DemoObjectMenu demoObjectMenu;
-    @javax.inject.Inject
-    CategoryRepository categoryRepository;
-    //endregion
 
     //region > constructor
     public ClassifiedDemoObjectsFixture() {
@@ -53,46 +48,88 @@ public class ClassifiedDemoObjectsFixture extends DiscoverableFixtureScript {
         // prereqs
         executionContext.executeChild(this, new ClassificationDemoAppTearDownFixture());
 
-        Taxonomy colourTaxonomy = categoryRepository.createTaxonomy("Colour");
-        Category colourOfRed = colourTaxonomy.addChild("Red");
-        Category colourOfGreen = colourTaxonomy.addChild("Green");
-        Category colourOfBlue = colourTaxonomy.addChild("Blue");
+        // italian taxonomy applicable only to Italian DemoObject and OtherObject
+        Taxonomy italianColours = categoryRepository.createTaxonomy("Italian Colours");
+        Category italianRed = italianColours.addChild("Red", "RED", null);
+        Category italianGreen = italianColours.addChild("Green", "GREEN", null);
+        Category italianWhite = italianColours.addChild("White", "WHITE", null);
 
-        Taxonomy sizeTaxonomy = categoryRepository.createTaxonomy("Size");
-        Category large = sizeTaxonomy.addChild("Large");
-        Category largeLarge = large.addChild("Large");
-        Category largeLarger = large.addChild("Larger");
-        Category largeLargest = large.addChild("Largest");
-        Category medium = sizeTaxonomy.addChild("Medium");
-        Category small = sizeTaxonomy.addChild("Small");
-        Category smallSmall = small.addChild("Small");
-        Category smallSmaller = small.addChild("Smaller");
-        Category smallSmallest = small.addChild("Smallest");
+        italianColours.applicable("/ITA", DemoObject.class);
+        italianColours.applicable("/ITA", OtherObject.class);
 
-        colourTaxonomy.applicableTo("/ITA", DemoObject.class);
+        // french taxonomy applicable only to French DemoObject (and not to OtherObject even if with FRA app tenancy)
+        Taxonomy frenchColours = categoryRepository.createTaxonomy("French Colours");
+        Category frenchRed = frenchColours.addChild("Red", null, null);
+        Category frenchWhite = frenchColours.addChild("White", null, null);
+        Category frenchBlue = frenchColours.addChild("Blue", null, null);
 
-        // TODO: need to make applicability transitive for all sub-tenancies
-        sizeTaxonomy.applicableTo("/", DemoObject.class);
-        sizeTaxonomy.applicableTo("/ITA", DemoObject.class);
+        frenchColours.applicable("/FRA", DemoObject.class);
 
-        final DemoObject foo = create("Foo", "/ITA", executionContext);
-        wrap(classify(foo)).$$(colourTaxonomy, colourOfRed);
-        wrap(classify(foo)).$$(sizeTaxonomy, medium);
+        // global taxonomy applicable only to DemoObject (any app tenancy)
+        Taxonomy globalSizes = categoryRepository.createTaxonomy("Sizes");
+        Category large = globalSizes.addChild("Large", "LGE", 1);
+        Category medium = globalSizes.addChild("Medium", "M", 2);
+        Category small = globalSizes.addChild("Small", "SML", 3);
 
-        final DemoObject bar = create("Bar", "/", executionContext);
-        wrap(classify(bar)).$$(sizeTaxonomy, smallSmaller);
+        Category largeLargest = large.addChild("Largest", "XXL", 1);
+        Category largeLarger = large.addChild("Larger", "XL", 2);
+        Category largeLarge = large.addChild("Large", "L", 3);
 
-        final DemoObject baz = create("Baz", "/", executionContext);
+        Category smallSmall = small.addChild("Small", "S", 1);
+        Category smallSmaller = small.addChild("Smaller", "XS", 2);
+        Category smallSmallest = small.addChild("Smallest", "XXS", 3);
+
+        globalSizes.applicable("/", DemoObject.class);
+
+
+        // create a sample set of DemoObject and OtherObject, for various app tenancies
+
+        final DemoObject demoFooInItaly = createDemo("Demo foo (in Italy)", "/ITA", executionContext);
+        final DemoObject demoBarInFrance = createDemo("Demo bar (in France)", "/FRA", executionContext);
+        final DemoObject demoBaz = createDemo("Demo baz (Global)", "/", executionContext);
+        final DemoObject demoBip = createDemo("Demo bip (in Milan)", "/ITA/I-MIL", executionContext);
+        final DemoObject demoBop = createDemo("Demo bop (in Paris)", "/FRA/F-PAR", executionContext);
+
+        final OtherObject otherFooInItaly = createOther("Other foo (in Italy)", "/ITA", executionContext);
+
+        final OtherObject otherBarInFrance = createOther("Other bar (in France)", "/FRA", executionContext);
+        final OtherObject otherBaz = createOther("Other baz (Global)", "/", executionContext);
+        final OtherObject otherBip = createOther("Other bip (in Milan)", "/ITA/I-MIL", executionContext);
+        final OtherObject otherBop = createOther("Other bop (in Paris)", "/FRA/F-PAR", executionContext);
+
+
+        // classify DemoObject
+        wrap(classify(demoFooInItaly)).$$(italianColours, italianRed);
+        wrap(classify(demoFooInItaly)).$$(globalSizes, medium);
+        wrap(classify(demoBarInFrance)).$$(globalSizes, smallSmaller);
+
+
+        // leave OtherObject unclassified
+
     }
 
-
-    // //////////////////////////////////////
-
-    private DemoObject create(
+    private DemoObject createDemo(
             final String name,
             final String atPath,
             final ExecutionContext executionContext) {
         return executionContext.addResult(this, wrap(demoObjectMenu).create(name, atPath));
     }
+
+    private OtherObject createOther(
+            final String name,
+            final String atPath,
+            final ExecutionContext executionContext) {
+        return executionContext.addResult(this, wrap(otherObjectMenu).create(name, atPath));
+    }
+
+    //region > injected services
+    @javax.inject.Inject
+    DemoObjectMenu demoObjectMenu;
+    @javax.inject.Inject
+    OtherObjectMenu otherObjectMenu;
+    @javax.inject.Inject
+    CategoryRepository categoryRepository;
+    //endregion
+
 
 }

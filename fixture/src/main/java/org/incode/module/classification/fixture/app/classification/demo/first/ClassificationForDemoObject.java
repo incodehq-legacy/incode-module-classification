@@ -16,14 +16,14 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.incode.module.classification.fixture.dom.classification;
+package org.incode.module.classification.fixture.app.classification.demo.first;
 
 import org.apache.isis.applib.annotation.DomainObject;
 import org.apache.isis.applib.annotation.DomainService;
 import org.apache.isis.applib.annotation.Mixin;
 import org.apache.isis.applib.annotation.NatureOfService;
 import org.incode.module.classification.dom.impl.classification.*;
-import org.incode.module.classification.fixture.dom.demo.DemoObject;
+import org.incode.module.classification.fixture.dom.demo.first.DemoObject;
 
 import javax.jdo.annotations.Column;
 import javax.jdo.annotations.IdentityType;
@@ -31,7 +31,7 @@ import javax.jdo.annotations.InheritanceStrategy;
 
 @javax.jdo.annotations.PersistenceCapable(
         identityType= IdentityType.DATASTORE,
-        schema="classificationdemo")
+        schema="incodeClassificationDemo")
 @javax.jdo.annotations.Inheritance(
         strategy = InheritanceStrategy.NEW_TABLE)
 @DomainObject(
@@ -55,7 +55,7 @@ public class ClassificationForDemoObject extends Classification {
     }
     //endregion
 
-    //region > aliased (hook, derived)
+    //region > classified (hook, derived)
     @Override
     public Object getClassified() {
         return getDemoObject();

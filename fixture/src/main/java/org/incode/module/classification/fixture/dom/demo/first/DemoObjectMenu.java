@@ -14,7 +14,7 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.incode.module.classification.fixture.dom.demo;
+package org.incode.module.classification.fixture.dom.demo.first;
 
 import org.apache.isis.applib.annotation.*;
 import org.apache.isis.applib.services.repository.RepositoryService;
@@ -26,6 +26,7 @@ import java.util.List;
         repositoryFor = DemoObject.class
 )
 @DomainServiceLayout(
+        named = "Some",
         menuOrder = "10"
 )
 public class DemoObjectMenu {

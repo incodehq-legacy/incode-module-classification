@@ -14,21 +14,17 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.incode.module.classification.fixture.dom.demo;
+package org.incode.module.classification.fixture.dom.demo.first;
+
+import org.apache.isis.applib.annotation.*;
+import org.apache.isis.applib.util.ObjectContracts;
 
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.VersionStrategy;
 
-import org.apache.isis.applib.annotation.BookmarkPolicy;
-import org.apache.isis.applib.annotation.DomainObject;
-import org.apache.isis.applib.annotation.DomainObjectLayout;
-import org.apache.isis.applib.annotation.Editing;
-import org.apache.isis.applib.annotation.Title;
-import org.apache.isis.applib.util.ObjectContracts;
-
 @javax.jdo.annotations.PersistenceCapable(
         identityType=IdentityType.DATASTORE,
-        schema="classificationdemo")
+        schema="incodeClassificationDemo")
 @javax.jdo.annotations.DatastoreIdentity(
         strategy=javax.jdo.annotations.IdGeneratorStrategy.IDENTITY,
          column="id")
@@ -36,7 +32,6 @@ import org.apache.isis.applib.util.ObjectContracts;
         strategy=VersionStrategy.VERSION_NUMBER, 
         column="version")
 @DomainObject(
-        objectType = "classificationdemo.DemoObject",
         editing = Editing.DISABLED
 )
 @DomainObjectLayout(
@@ -94,6 +89,5 @@ public class DemoObject implements Comparable<DemoObject> {
 
     //endregion
 
-    //region > injected services
 
 }
