@@ -35,23 +35,23 @@ image::http://yuml.me/2a277faf[link="http://yuml.me/2a277faf"]
 The `Taxonomy` entity defines a hierarchy of ``Category``s, with the `Taxonomy` itself acting as the root of each such
 hierarchy.  In many cases the `Taxonomy` will be only two levels deep, in effect defining a enum, eg:
 
-* `Italian Colours` root classification, with children:
-** `Italian Colours/Red`
-** `Italian Colours/White`
-** `Italian Colours/Green`
+* "Italian Colours" root classification, with children:
+** "Italian Colours/Red"
+** "Italian Colours/White"
+** "Italian Colours/Green"
 
 However, deeper ``Taxonomy``s are possible, eg:
 
-* `Sizes`
-** `Sizes/Small`
-*** `Sizes/Small/Smallest`
-*** `Sizes/Small/Smaller`
-*** `Sizes/Small/Small`
-** `Sizes/Medium`
-** `Sizes/Large`
-*** `Sizes/Large/Large`
-*** `Sizes/Large/Larger`
-*** `Sizes/Large/Largest`
+* "Sizes`
+** "Sizes/Small"
+*** "Sizes/Small/Smallest"
+*** "Sizes/Small/Smaller"
+*** "Sizes/Small/Small"
+** "Sizes/Medium"
+** "Sizes/Large"
+*** "Sizes/Large/Large"
+*** "Sizes/Large/Larger"
+*** "Sizes/Large/Largest"
 
 There can be many such taxonomies; any given domain object can only have one `Classification` per `Taxonomy`.
 hierarchy (but not more than one classification per hierarchy).  Thus, a domain object might be classified as both
@@ -62,13 +62,21 @@ hierarchy (but not more than one classification per hierarchy).  Thus, a domain 
 
 Not every domain object can be classified with respect to every ``Taxonomy``.  Instead, the available set is restricted by
 the `Applicability` entity.  This identifies which ``Taxonomy``(s) can be associated with domain object types.
-This is further qualified by the application tenancy of the domain object (for multi-tenanted applications).  The
-`ApplicationTenancyService` SPI service is used to obtain the application tenancy of each domain object.
+This is further qualified by the application tenancy of the domain object (for multi-tenanted applications).
+
+The `ApplicationTenancyService` SPI service is used to obtain the application tenancy of each domain object.
 
 === `Classification`
 
 The `Classification` is the tuple that associates a particular domain object with a particular `Category` in some
-`Taxonomy`.
+`Taxonomy`.  This must be with respect to some `Applicability`.
+
+[NOTE]
+====
+The module does _not_ prevent an `Applicability` from being removed, even if there are existing ``Classification``s
+that rely upon that `Applicability`.
+====
+
 
 
 
@@ -99,7 +107,7 @@ image::https://raw.githubusercontent.com/incodehq/incode-module-classification/m
 
 We can then list the taxonomies:
 
-image::https://raw.githubusercontent.com/incodehq/incode-module-classification/master/images/030-list-taxonomies[link="https://raw.githubusercontent.com/incodehq/incode-module-classification/master/images/030-list-taxonomies.png"]
+image::https://raw.githubusercontent.com/incodehq/incode-module-classification/master/images/030-list-taxonomies.png[link="https://raw.githubusercontent.com/incodehq/incode-module-classification/master/images/030-list-taxonomies.png"]
 
 
 which returns the three demo taxonomies, "Size", "Italian Colours" and "French Colours":
@@ -149,7 +157,7 @@ taxonomy
 | "Size" +
 taxonomy
 
-5.+| `DemoObject`
+.5+| `DemoObject`
 |`/`
 |No
 |No
@@ -175,7 +183,7 @@ taxonomy
 |Yes
 |Yes
 
-5.+| `OtherObject`
+.5+| `OtherObject`
 |`/`
 |No
 |No
@@ -335,7 +343,7 @@ public List<Class<?>> getModules() {
 
 Notes:
 
-* Check for later releases by searching http://search.maven.org/#search|ga|1|incode-module-classification-dom[Maven Central Repo]).
+* Check for later releases by searching http://search.maven.org/#search|ga|1|incode-module-classification-dom[Maven Central Repo].
 
 
 ==== "Out-of-the-box" (-SNAPSHOT)
@@ -505,7 +513,7 @@ The attached `Classification` objects are shown in two contexts: as a table of `
 In the former case (as a table) the `Classification` will be rendered according to the `Classification.layout.xml`
 provided by the module.  In the latter (as an object) the classification will be rendered according to the layout
 provided by the consuming app, offering full control of the layout.  The layout provided in the demo app
-(ie link:https://github.com/incodehq/incode-module-classification/blob/master/fixture/src/main/java/org/incode/module/classification/fixture/app/classification/ClassificationForDemoObject.layout.xml[`ClassificationForDemoObject.layout.xml`])
+(ie link:https://github.com/incodehq/incode-module-classification/blob/master/fixture/src/main/java/org/incode/module/classification/fixture/app/classification/demo/ClassificationForDemoObject.layout.xml[`ClassificationForDemoObject.layout.xml`])
 is a good starting point.
 
 The module also allows the title, icon and CSS for `Classification`, `Category` and `Applicability` objects to be
@@ -516,7 +524,7 @@ implementations.
 
 [TIP]
 ====
-The (non-ASF) http://github.com/incodehq/incode-module-alias[Isis addons' alias] module also allows the title/icon/CSS class to be overridden; its example application includes an example to demonstrate how this is done.
+The (non-ASF) http://github.com/incodehq/incode-module-alias[Incode alias] module also allows the title/icon/CSS class to be overridden; its example application includes an example to demonstrate how this is done.
 ====
 
 
