@@ -28,15 +28,6 @@ public class Taxonomy extends Category {
     //endregion
 
 
-    //region > all (derived collection)
-    public static class AllDomainEvent extends CollectionDomainEvent<Category> { }
-    @javax.jdo.annotations.NotPersistent
-    @Collection(notPersisted = true)
-    public List<Category> getAll() {
-        return categoryRepository.findByTaxonomy(this);
-    }
-    //endregion
-
     //region > applicabilties (collection)
     public static class ApplicabilitiesDomainEvent extends CollectionDomainEvent<Applicability> { }
     @javax.jdo.annotations.Persistent(mappedBy = "taxonomy", dependentElement = "true")

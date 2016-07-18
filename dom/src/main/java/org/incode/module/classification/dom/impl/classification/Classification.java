@@ -27,12 +27,15 @@ import org.apache.isis.applib.services.title.TitleService;
 import org.apache.isis.applib.util.ObjectContracts;
 import org.incode.module.classification.dom.ClassificationModule;
 import org.incode.module.classification.dom.impl.category.Category;
+import org.incode.module.classification.dom.impl.category.CategoryRepository;
 import org.incode.module.classification.dom.impl.category.taxonomy.Taxonomy;
 
 import javax.inject.Inject;
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.InheritanceStrategy;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @javax.jdo.annotations.PersistenceCapable(
         identityType=IdentityType.DATASTORE,
@@ -188,9 +191,17 @@ public abstract class Classification implements Comparable<Classification> {
     @javax.jdo.annotations.Column(allowsNull = "false", name = "categoryId")
     @Property(
             domainEvent = CategoryDomainEvent.class,
-            editing = Editing.DISABLED
+            editing = Editing.ENABLED
     )
     private Category category;
+
+    public List<Category> choicesCategory() {
+        final List<Category> categories = categoryRepository.findByTaxonomy(getTaxonomy());
+        return categories.stream()
+                .filter(x -> x.getParent() != null) // exclude top-level taxonomy
+                .collect(Collectors.toList());
+    }
+
     //endregion
 
 
@@ -229,5 +240,8 @@ public abstract class Classification implements Comparable<Classification> {
     //region > injected services
     @Inject
     ClassificationRepository classificationRepository;
+    @Inject
+    CategoryRepository categoryRepository;
     //endregion
+
 }

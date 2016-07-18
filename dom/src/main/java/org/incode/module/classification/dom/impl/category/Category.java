@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.isis.applib.AbstractSubscriber;
 import org.apache.isis.applib.annotation.*;
+import org.apache.isis.applib.annotation.Collection;
+import org.apache.isis.applib.services.i18n.TranslatableString;
 import org.apache.isis.applib.services.repository.RepositoryService;
 import org.apache.isis.applib.util.ObjectContracts;
 import org.incode.module.classification.dom.ClassificationModule;
@@ -13,10 +15,8 @@ import org.incode.module.classification.dom.impl.category.taxonomy.Taxonomy;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.jdo.annotations.*;
-import java.util.Objects;
+import java.util.*;
 import java.util.Optional;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 @javax.jdo.annotations.PersistenceCapable(
         schema = "incodeClassification",
@@ -39,7 +39,7 @@ import java.util.TreeSet;
         @javax.jdo.annotations.Query(
                 name = "findByTaxonomy", language = "JDOQL",
                 value = "SELECT "
-                        + "FROM org.incode.module.classification.dom.impl.category.Taxonomy "
+                        + "FROM org.incode.module.classification.dom.impl.category.Category "
                         + "WHERE taxonomy == :taxonomy "
                         + "ORDER BY fullyQualifiedOrdinal "),
         @javax.jdo.annotations.Query(
@@ -71,9 +71,7 @@ import java.util.TreeSet;
                 name="Classification_parent_Name_UNQ",
                 members = { "parent", "name" })
 })
-@DomainObject(
-        editing = Editing.DISABLED
-)
+@DomainObject()
 @DomainObjectLayout(
         titleUiEvent = Category.TitleUiEvent.class,
         iconUiEvent = Category.IconUiEvent.class,
@@ -201,7 +199,10 @@ public class Category implements Comparable<Category> {
     //region > taxonomy (property)
     public static class TaxonomyDomainEvent extends PropertyDomainEvent<Category> { }
     @Column(allowsNull = "true", name = "taxonomyId") // conceptually, not-null; however a taxonomy will refer to itself
-    @Property(domainEvent = TaxonomyDomainEvent.class)
+    @Property(
+            domainEvent = TaxonomyDomainEvent.class,
+            editing = Editing.DISABLED
+    )
     @Getter @Setter
     private Taxonomy taxonomy;
     //endregion
@@ -211,14 +212,20 @@ public class Category implements Comparable<Category> {
     @Title
     @Getter @Setter
     @javax.jdo.annotations.Column(allowsNull = "false", length = ClassificationModule.JdoColumnLength.CATEGORY_FQNAME)
-    @Property(domainEvent = FullyQualifiedNameDomainEvent.class)
+    @Property(
+            domainEvent = FullyQualifiedNameDomainEvent.class,
+            editing = Editing.DISABLED
+    )
     private String fullyQualifiedName;
     //endregion
 
     //region > parent (property)
     public static class ParentDomainEvent extends PropertyDomainEvent<Category> { }
     @Column(allowsNull = "true", name = "parentId")
-    @Property(domainEvent = ParentDomainEvent.class)
+    @Property(
+            domainEvent = ParentDomainEvent.class,
+            editing = Editing.DISABLED
+    )
     @Getter @Setter
     private Category parent;
 
@@ -233,6 +240,27 @@ public class Category implements Comparable<Category> {
     @javax.jdo.annotations.Column(allowsNull = "false", length = ClassificationModule.JdoColumnLength.CATEGORY_NAME)
     @Property(domainEvent = NameDomainEvent.class)
     private String name;
+
+    public TranslatableString validateName(final String name) {
+        if (name == null) return null;
+        final Category existingCategoryIfAny = categoryRepository.findByParentAndName(getParent(), name);
+        return existingCategoryIfAny != null
+                ? TranslatableString.tr("A category with name '{name}' already exists (under this parent)", "name", name)
+                : null;
+    }
+
+    public void modifyName(final String name) {
+        setName(name);
+        deriveFullyQualifiedName();
+        List<Category> childCategories = categoryRepository.findByParentCascade(this);
+        for (Category childCategory : childCategories) {
+            childCategory.deriveFullyQualifiedName();
+        }
+    }
+    public void clearName() {
+        modifyName(null);
+    }
+
     //endregion
 
     //region > reference (property)
@@ -245,13 +273,24 @@ public class Category implements Comparable<Category> {
     @javax.jdo.annotations.Column(allowsNull = "true", length = ClassificationModule.JdoColumnLength.CATEGORY_REFERENCE)
     @Property(domainEvent = ReferenceDomainEvent.class)
     private String reference;
+
+    public TranslatableString validateReference(final String reference) {
+        if (reference == null) return null;
+        final Category existingCategoryIfAny = categoryRepository.findByParentAndReference(getParent(), reference);
+        return existingCategoryIfAny != null
+                ? TranslatableString.tr("A category with reference '{reference}' already exists (under this parent)", "reference", reference)
+                : null;
+    }
     //endregion
 
     //region > fullyQualifiedName (derived property, persisted)
     public static class FullyQualifiedOrdinalDomainEvent extends PropertyDomainEvent<String> { }
     @Getter @Setter
     @javax.jdo.annotations.Column(allowsNull = "false", length = ClassificationModule.JdoColumnLength.CATEGORY_FQORDINAL)
-    @Property(domainEvent = FullyQualifiedOrdinalDomainEvent.class)
+    @Property(
+            domainEvent = FullyQualifiedOrdinalDomainEvent.class,
+            editing = Editing.DISABLED
+    )
     private String fullyQualifiedOrdinal;
     //endregion
 
@@ -264,14 +303,33 @@ public class Category implements Comparable<Category> {
      */
     @Getter @Setter
     @javax.jdo.annotations.Column(allowsNull = "true")
-    @Property(domainEvent = OrdinalDomainEvent.class)
+    @Property(
+            domainEvent = OrdinalDomainEvent.class,
+            editing = Editing.ENABLED
+    )
+    @PropertyLayout(
+            named = "(Sorting) ordinal"
+    )
     private Integer ordinal;
+
+    public void modifyOrdinal(final Integer ordinal) {
+        setOrdinal(ordinal != null? ordinal: 0);
+        deriveFullyQualifiedOrdinal();
+        List<Category> childCategories = categoryRepository.findByParentCascade(this);
+        for (Category childCategory : childCategories) {
+            childCategory.deriveFullyQualifiedOrdinal();
+        }
+    }
+    public void clearOrdinal() {
+        modifyOrdinal(null);
+    }
+
     //endregion
 
 
     //region > children (property)
     @Persistent(mappedBy = "parent", dependentElement = "false")
-    @Collection()
+    @Collection(editing = Editing.DISABLED)
     @Getter @Setter
     private SortedSet<Category> children = new TreeSet<>();
     //endregion
@@ -293,9 +351,7 @@ public class Category implements Comparable<Category> {
             @Nullable
             @ParameterLayout(named = "(Sorting) ordinal")
             final Integer ordinal) {
-        final Category category = new Category(this, name, reference, ordinal);
-        repositoryService.persistAndFlush(category);
-        return category;
+        return categoryRepository.createChild(this, name, reference, ordinal);
     }
 
     public String validate0AddChild(final String localName) {
@@ -314,7 +370,7 @@ public class Category implements Comparable<Category> {
     )
     @MemberOrder(name = "children", sequence = "2")
     public Category removeChild(final Category category) {
-        removeCascade(category);
+        categoryRepository.removeCascade(category);
         return this;
     }
 
@@ -322,15 +378,18 @@ public class Category implements Comparable<Category> {
         return getChildren();
     }
 
-    private void removeCascade(final Category category) {
-        SortedSet<Category> children = category.getChildren();
-        for (Category child : children) {
-            removeCascade(child);
-        }
-        repositoryService.remove(category);
-    }
 
     // endregion
+
+
+    //region > all (derived collection)
+    public static class AllDomainEvent extends CollectionDomainEvent<Category> { }
+    @javax.jdo.annotations.NotPersistent
+    @Collection(notPersisted = true, editing = Editing.DISABLED)
+    public List<Category> getAll() {
+        return categoryRepository.findByParentCascade(this);
+    }
+    //endregion
 
 
     //region > toString, compareTo
@@ -347,11 +406,13 @@ public class Category implements Comparable<Category> {
 
     //endregion
 
+
     //region > injected services
 
     @Inject
-    protected
-    RepositoryService repositoryService;
+    protected RepositoryService repositoryService;
+    @Inject
+    protected CategoryRepository categoryRepository;
 
     //endregion
 

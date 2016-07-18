@@ -29,31 +29,44 @@ import java.util.List;
 
 public class DemoObjectMenuTest extends ClassificationModuleIntegTest {
 
-    @Inject
-    DemoObjectMenu demoObjectMenu;
+    ClassifiedDemoObjectsFixture fs;
 
     @Before
     public void setUpData() throws Exception {
-        fixtureScripts.runFixtureScript(new ClassifiedDemoObjectsFixture(), null);
+        fs = new ClassifiedDemoObjectsFixture();
+        fixtureScripts.runFixtureScript(fs, null);
     }
 
     @Test
     public void listAll() throws Exception {
 
+        // given
+        int numDemoObjects = fs.getDemoObjects().size();
+
+        // when
         final List<DemoObject> all = wrap(demoObjectMenu).listAll();
-        Assertions.assertThat(all.size()).isEqualTo(3);
-        
-        DemoObject demoObject = wrap(all.get(0));
-        Assertions.assertThat(demoObject.getName()).isEqualTo("Foo");
+
+        // then
+        Assertions.assertThat(all.size()).isEqualTo(numDemoObjects);
     }
     
     @Test
     public void create() throws Exception {
 
+        // given
+        final List<DemoObject> before = wrap(demoObjectMenu).listAll();
+        int numBefore = before.size();
+
+        // when
         wrap(demoObjectMenu).create("Faz", "/");
-        
-        final List<DemoObject> all = wrap(demoObjectMenu).listAll();
-        Assertions.assertThat(all.size()).isEqualTo(4);
+
+        // then
+        final List<DemoObject> after = wrap(demoObjectMenu).listAll();
+        Assertions.assertThat(after.size()).isEqualTo(numBefore+1);
     }
+
+    @Inject
+    DemoObjectMenu demoObjectMenu;
+
 
 }

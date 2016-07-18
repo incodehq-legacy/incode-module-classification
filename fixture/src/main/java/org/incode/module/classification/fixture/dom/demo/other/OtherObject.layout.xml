@@ -20,10 +20,10 @@
                         </bs3:col>
                     </bs3:row>
                 </bs3:tab>
-                <bs3:tab name="Other">
+                <bs3:tab name="Others">
                     <bs3:row>
                         <bs3:col span="12">
-                            <cpt:fieldSet name="Other" id="other" unreferencedProperties="true">
+                            <cpt:fieldSet name="Others" id="others" unreferencedProperties="true">
                             </cpt:fieldSet>
                         </bs3:col>
                     </bs3:row>

@@ -18,6 +18,7 @@
  */
 package org.incode.module.classification.dom.impl.category;
 
+import com.google.common.collect.Lists;
 import org.apache.isis.applib.annotation.DomainService;
 import org.apache.isis.applib.annotation.NatureOfService;
 import org.apache.isis.applib.annotation.Programmatic;
@@ -27,6 +28,7 @@ import org.incode.module.classification.dom.impl.category.taxonomy.Taxonomy;
 
 import javax.inject.Inject;
 import java.util.List;
+import java.util.SortedSet;
 
 @DomainService(
         nature = NatureOfService.DOMAIN,
@@ -64,12 +66,38 @@ public class CategoryRepository {
     }
     //endregion
 
+
+    //region > findByParentCascade (programmatic)
+    @Programmatic
+    public List<Category> findByParentCascade(Category category) {
+        final List<Category> allCategories = Lists.newArrayList();
+        append(category, allCategories);
+        return allCategories;
+    }
+
+    void append(final Category parent, final List<Category> all) {
+        final List<Category> children = findByParent(parent);
+        all.addAll(children);
+        for (Category category : children) {
+            append(category, all);
+        }
+    }
+
+    List<Category> appendChildCategories(Category category, List<Category> allCategories) {
+        List<Category> childCategories = findByParent(category);
+        allCategories.addAll(childCategories);
+        return childCategories;
+    }
+
+    //endregion
+
+
     //region > findByParentAndName (programmatic)
     @Programmatic
     public Category findByParentAndName(final Category parent, final String name) {
         return repositoryService.uniqueMatch(
                 new QueryDefault<>(Category.class,
-                        "findByParentAndLocalName",
+                        "findByParentAndName",
                         "parent", parent,
                         "name", name));
     }
@@ -80,14 +108,13 @@ public class CategoryRepository {
     public Category findByParentAndReference(final Category parent, final String reference) {
         return repositoryService.uniqueMatch(
                 new QueryDefault<>(Category.class,
-                        "findByParentAndLocalReference",
+                        "findByParentAndReference",
                         "parent", parent,
                         "reference", reference));
     }
     //endregion
 
     //region > createTaxonomy (programmatic)
-
     @Programmatic
     public Taxonomy createTaxonomy(final String name) {
         final Taxonomy taxonomy = new Taxonomy(name);
@@ -95,12 +122,33 @@ public class CategoryRepository {
         taxonomy.setTaxonomy(taxonomy);
         return taxonomy;
     }
+    //endregion
 
+    //region > createChild (programmatic)
+    @Programmatic
+    public Category createChild(Category parent, String name, String reference, Integer ordinal) {
+        final Category category = new Category(parent, name, reference, ordinal);
+        repositoryService.persistAndFlush(category);
+        return category;
+
+    }
+    //endregion
+
+    //region > removeCascade (programmatic)
+    @Programmatic
+    public void removeCascade(final Category category) {
+        SortedSet<Category> children = category.getChildren();
+        for (Category child : children) {
+            removeCascade(child);
+        }
+        repositoryService.remove(category);
+    }
     //endregion
 
     //region > injected
     @Inject
     RepositoryService repositoryService;
+
     //endregion
 
 }

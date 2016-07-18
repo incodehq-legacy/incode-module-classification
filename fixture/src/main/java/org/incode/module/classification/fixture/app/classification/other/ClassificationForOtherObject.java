@@ -16,13 +16,11 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.incode.module.classification.fixture.app.classification.demo.other;
+package org.incode.module.classification.fixture.app.classification.other;
 
-import org.apache.isis.applib.annotation.DomainObject;
-import org.apache.isis.applib.annotation.DomainService;
-import org.apache.isis.applib.annotation.Mixin;
-import org.apache.isis.applib.annotation.NatureOfService;
+import org.apache.isis.applib.annotation.*;
 import org.incode.module.classification.dom.impl.classification.*;
+import org.incode.module.classification.dom.spi.ApplicationTenancyService;
 import org.incode.module.classification.fixture.dom.demo.other.OtherObject;
 
 import javax.jdo.annotations.Column;
@@ -32,20 +30,15 @@ import javax.jdo.annotations.InheritanceStrategy;
 @javax.jdo.annotations.PersistenceCapable(
         identityType= IdentityType.DATASTORE,
         schema="incodeClassificationDemo")
-@javax.jdo.annotations.Inheritance(
-        strategy = InheritanceStrategy.NEW_TABLE)
-@DomainObject(
-        objectType = "classificationdemo.ClassificationForOtherObject"
-)
+@javax.jdo.annotations.Inheritance(strategy = InheritanceStrategy.NEW_TABLE)
+@DomainObject()
 public class ClassificationForOtherObject extends Classification {
 
     //region > otherObject (property)
     private OtherObject otherObject;
 
-    @Column(
-            allowsNull = "false",
-            name = "otherObjectId"
-    )
+    @Column(allowsNull = "false", name = "otherObjectId")
+    @Property(editing = Editing.DISABLED)
     public OtherObject getOtherObject() {
         return otherObject;
     }
@@ -67,8 +60,21 @@ public class ClassificationForOtherObject extends Classification {
     }
     //endregion
 
-    //region > SubtypeProvider SPI implementation
+    //region > ApplicationTenancyService SPI implementation
+    @DomainService(nature = NatureOfService.DOMAIN)
+    public static class ApplicationTenancyServiceForOtherObject implements ApplicationTenancyService {
 
+        @Override
+        public String atPathFor(final Object domainObjectToClassify) {
+            if(domainObjectToClassify instanceof OtherObject) {
+                return ((OtherObject) domainObjectToClassify).getAtPath();
+            }
+            return null;
+        }
+    }
+    //endregion
+
+    //region > SubtypeProvider SPI implementation
     @DomainService(nature = NatureOfService.DOMAIN)
     public static class SubtypeProvider extends ClassificationRepository.SubtypeProviderAbstract {
         public SubtypeProvider() {

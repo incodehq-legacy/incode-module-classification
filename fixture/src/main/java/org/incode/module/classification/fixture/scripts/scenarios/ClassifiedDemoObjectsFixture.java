@@ -16,19 +16,23 @@
  */
 package org.incode.module.classification.fixture.scripts.scenarios;
 
+import com.google.common.collect.Lists;
 import org.apache.isis.applib.fixturescripts.DiscoverableFixtureScript;
 import org.incode.module.classification.dom.impl.category.Category;
 import org.incode.module.classification.dom.impl.category.CategoryRepository;
 import org.incode.module.classification.dom.impl.category.taxonomy.Taxonomy;
 import org.incode.module.classification.dom.impl.classification.T_classify;
-import org.incode.module.classification.fixture.app.classification.demo.first.ClassificationForDemoObject;
+import org.incode.module.classification.fixture.app.classification.demo.ClassificationForDemoObject;
 import org.incode.module.classification.fixture.dom.demo.first.DemoObject;
 import org.incode.module.classification.fixture.dom.demo.first.DemoObjectMenu;
 import org.incode.module.classification.fixture.dom.demo.other.OtherObject;
 import org.incode.module.classification.fixture.dom.demo.other.OtherObjectMenu;
 import org.incode.module.classification.fixture.scripts.teardown.ClassificationDemoAppTearDownFixture;
 
+import java.util.List;
+
 public class ClassifiedDemoObjectsFixture extends DiscoverableFixtureScript {
+
 
     //region > constructor
     public ClassifiedDemoObjectsFixture() {
@@ -39,6 +43,20 @@ public class ClassifiedDemoObjectsFixture extends DiscoverableFixtureScript {
     //region > mixins
     T_classify classify(final Object classifiable) {
         return mixin(ClassificationForDemoObject._classify.class, classifiable);
+    }
+    //endregion
+
+    //region > demoObjects (output)
+    private List<DemoObject> demoObjects = Lists.newArrayList();
+    public List<DemoObject> getDemoObjects() {
+        return demoObjects;
+    }
+    //endregion
+
+    //region > otherObjects (output)
+    private List<OtherObject> otherObjects = Lists.newArrayList();
+    public List<OtherObject> getOtherObjects() {
+        return otherObjects;
     }
     //endregion
 
@@ -112,14 +130,18 @@ public class ClassifiedDemoObjectsFixture extends DiscoverableFixtureScript {
             final String name,
             final String atPath,
             final ExecutionContext executionContext) {
-        return executionContext.addResult(this, wrap(demoObjectMenu).create(name, atPath));
+        final DemoObject demoObject = wrap(demoObjectMenu).create(name, atPath);
+        demoObjects.add(demoObject);
+        return executionContext.addResult(this, demoObject);
     }
 
     private OtherObject createOther(
             final String name,
             final String atPath,
             final ExecutionContext executionContext) {
-        return executionContext.addResult(this, wrap(otherObjectMenu).create(name, atPath));
+        final OtherObject otherObject = wrap(otherObjectMenu).create(name, atPath);
+        otherObjects.add(otherObject);
+        return executionContext.addResult(this, otherObject);
     }
 
     //region > injected services
