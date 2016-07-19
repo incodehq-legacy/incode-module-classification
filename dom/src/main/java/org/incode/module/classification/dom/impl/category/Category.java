@@ -32,12 +32,6 @@ import java.util.Optional;
 @javax.jdo.annotations.Discriminator(strategy = DiscriminatorStrategy.CLASS_NAME) // can just check if has a parent
 @javax.jdo.annotations.Queries({
         @javax.jdo.annotations.Query(
-                name = "findByFullyQualifiedName", language = "JDOQL",
-                value = "SELECT "
-                        + "FROM org.incode.module.classification.dom.impl.category.Category "
-                        + "WHERE fullyQualifiedName == :fullyQualifiedName "
-                        + "ORDER BY fullyQualifiedOrdinal "),
-        @javax.jdo.annotations.Query(
                 name = "findByTaxonomy", language = "JDOQL",
                 value = "SELECT "
                         + "FROM org.incode.module.classification.dom.impl.category.Category "
@@ -357,10 +351,26 @@ public class Category implements Comparable<Category> {
         return categoryRepository.createChild(this, name, reference, ordinal);
     }
 
-    public String validate0AddChild(final String localName) {
+    public TranslatableString validate0AddChild(final String name) {
         final Optional<Category> any =
-                getChildren().stream().filter(x -> Objects.equals(x.getName(), localName)).findAny();
-        return any.isPresent() ? "There is already a child classification with the name of '" + localName + "'": null;
+                getChildren().stream().filter(x -> Objects.equals(x.getName(), name)).findAny();
+        return any.isPresent()
+                ? TranslatableString.tr(
+                        "There is already a child classification with the name of '{name}'",
+                        "name", name)
+                : null;
+    }
+    public TranslatableString validate1AddChild(final String reference) {
+        if(reference == null) {
+            return null;
+        }
+        final Optional<Category> any =
+                getChildren().stream().filter(x -> Objects.equals(x.getReference(), reference)).findAny();
+        return any.isPresent()
+                ? TranslatableString.tr(
+                "There is already a child classification with the reference of '{reference}'",
+                "reference", reference)
+                : null;
     }
     // endregion
 

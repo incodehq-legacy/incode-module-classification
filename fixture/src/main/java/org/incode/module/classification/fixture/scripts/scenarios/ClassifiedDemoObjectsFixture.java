@@ -72,8 +72,8 @@ public class ClassifiedDemoObjectsFixture extends DiscoverableFixtureScript {
         Category italianGreen = italianColours.addChild("Green", "GREEN", null);
         Category italianWhite = italianColours.addChild("White", "WHITE", null);
 
-        italianColours.applicable("/ITA", DemoObject.class);
-        italianColours.applicable("/ITA", OtherObject.class);
+        wrap(italianColours).applicable("/ITA", DemoObject.class.getName());
+        wrap(italianColours).applicable("/ITA", OtherObject.class.getName());
 
         // french taxonomy applicable only to French DemoObject (and not to OtherObject even if with FRA app tenancy)
         Taxonomy frenchColours = categoryRepository.createTaxonomy("French Colours");
@@ -81,7 +81,7 @@ public class ClassifiedDemoObjectsFixture extends DiscoverableFixtureScript {
         Category frenchWhite = frenchColours.addChild("White", null, null);
         Category frenchBlue = frenchColours.addChild("Blue", null, null);
 
-        frenchColours.applicable("/FRA", DemoObject.class);
+        wrap(frenchColours).applicable("/FRA", DemoObject.class.getName());
 
         // global taxonomy applicable only to DemoObject (any app tenancy)
         Taxonomy globalSizes = categoryRepository.createTaxonomy("Sizes");
@@ -97,7 +97,7 @@ public class ClassifiedDemoObjectsFixture extends DiscoverableFixtureScript {
         Category smallSmaller = small.addChild("Smaller", "XS", 2);
         Category smallSmallest = small.addChild("Smallest", "XXS", 3);
 
-        globalSizes.applicable("/", DemoObject.class);
+        wrap(globalSizes).applicable("/", DemoObject.class.getName());
 
 
         // create a sample set of DemoObject and OtherObject, for various app tenancies

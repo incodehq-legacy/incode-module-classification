@@ -64,7 +64,7 @@ public abstract class T_classify<T> {
     public T $$(
             final Taxonomy taxonomy,
             final Category category) {
-        classificationRepository.create(taxonomy, category, classified);
+        classificationRepository.create(category, classified);
         return classified;
     }
 

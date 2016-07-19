@@ -49,14 +49,16 @@ public class Taxonomy extends Category {
             cssClassFa = "fa-plus"
     )
     @MemberOrder(name = "appliesTo", sequence = "1")
-    public Category applicable(final String atPath, final Class<?> domainType) {
-        String domainTypeName = domainType.getName();
+    public Category applicable(
+            @ParameterLayout(named = "Application tenancy")
+            final String atPath,
+            @ParameterLayout(named = "Domain type")
+            final String domainTypeName) {
         Applicability applicability = new Applicability(this, atPath, domainTypeName);
         repositoryService.persistAndFlush(applicability);
         return this;
     }
-    public TranslatableString validateApplicable(final String atPath, final Class<?> domainType) {
-        String domainTypeName = domainType.getName();
+    public TranslatableString validateApplicable(final String atPath, final String domainTypeName) {
         final Optional<Applicability> any =
                 getAppliesTo().stream()
                         .filter(x -> Objects.equals(x.getAtPath(), atPath) &&
@@ -84,6 +86,10 @@ public class Taxonomy extends Category {
     public Category notApplicable(final Applicability applicability) {
         repositoryService.remove(applicability);
         return this;
+    }
+
+    public TranslatableString disableNotApplicable() {
+        return choices0NotApplicable().isEmpty()? TranslatableString.tr("No applicabilities to remove"): null;
     }
 
     public SortedSet<Applicability> choices0NotApplicable() {

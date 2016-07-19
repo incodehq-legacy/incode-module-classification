@@ -67,9 +67,10 @@ public class ClassificationRepository {
 
     @Programmatic
     public Classification create(
-            final Taxonomy taxonomy,
             final Category category,
             final Object classified) {
+
+        final Taxonomy taxonomy = category.getTaxonomy();
         final Class<? extends Classification> subtype = subtypeClassFor(taxonomy, classified);
 
         final Classification classification = repositoryService.instantiate(subtype);

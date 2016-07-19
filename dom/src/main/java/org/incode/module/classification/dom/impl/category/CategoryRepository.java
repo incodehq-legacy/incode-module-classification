@@ -36,16 +36,6 @@ import java.util.SortedSet;
 )
 public class CategoryRepository {
 
-    //region > findByFullyQualifiedName (programmatic)
-    @Programmatic
-    public Category findByFullyQualifiedName(final String fullyQualifiedName) {
-        return repositoryService.uniqueMatch(
-                new QueryDefault<>(Category.class,
-                        "findByFullyQualifiedName",
-                        "fullyQualifiedName", fullyQualifiedName));
-    }
-    //endregion
-
     //region > findByTaxonomy (programmatic)
     @Programmatic
     public List<Category> findByTaxonomy(final Taxonomy taxonomy) {
@@ -81,12 +71,6 @@ public class CategoryRepository {
         for (Category category : children) {
             append(category, all);
         }
-    }
-
-    List<Category> appendChildCategories(Category category, List<Category> allCategories) {
-        List<Category> childCategories = findByParent(category);
-        allCategories.addAll(childCategories);
-        return childCategories;
     }
 
     //endregion
@@ -138,7 +122,7 @@ public class CategoryRepository {
     @Programmatic
     public void removeCascade(final Category category) {
         SortedSet<Category> children = category.getChildren();
-        for (Category child : children) {
+        for (final Category child : children) {
             removeCascade(child);
         }
         repositoryService.remove(category);
