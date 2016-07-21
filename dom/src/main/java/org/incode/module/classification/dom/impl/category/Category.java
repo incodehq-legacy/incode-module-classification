@@ -44,6 +44,12 @@ import java.util.Optional;
                         + "WHERE parent == :parent "
                         + "ORDER BY fullyQualifiedOrdinal "),
         @javax.jdo.annotations.Query(
+                name = "findByName", language = "JDOQL",
+                value = "SELECT "
+                        + "FROM org.incode.module.classification.dom.impl.category.Category "
+                        + "WHERE name == :name "
+                        + "ORDER BY fullyQualifiedOrdinal "),
+        @javax.jdo.annotations.Query(
                 name = "findByParentAndName", language = "JDOQL",
                 value = "SELECT "
                         + "FROM org.incode.module.classification.dom.impl.category.Category "

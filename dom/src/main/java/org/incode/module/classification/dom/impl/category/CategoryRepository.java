@@ -18,17 +18,20 @@
  */
 package org.incode.module.classification.dom.impl.category;
 
+import java.util.List;
+import java.util.SortedSet;
+
+import javax.inject.Inject;
+
 import com.google.common.collect.Lists;
+
 import org.apache.isis.applib.annotation.DomainService;
 import org.apache.isis.applib.annotation.NatureOfService;
 import org.apache.isis.applib.annotation.Programmatic;
 import org.apache.isis.applib.query.QueryDefault;
 import org.apache.isis.applib.services.repository.RepositoryService;
-import org.incode.module.classification.dom.impl.category.taxonomy.Taxonomy;
 
-import javax.inject.Inject;
-import java.util.List;
-import java.util.SortedSet;
+import org.incode.module.classification.dom.impl.category.taxonomy.Taxonomy;
 
 @DomainService(
         nature = NatureOfService.DOMAIN,
@@ -56,6 +59,15 @@ public class CategoryRepository {
     }
     //endregion
 
+    //region > findByName (programmatic)
+    @Programmatic
+    public List<Category> findByName(final String name) {
+        return repositoryService.allMatches(
+                new QueryDefault<>(Category.class,
+                        "findByName",
+                        "name", name));
+    }
+    //endregion
 
     //region > findByParentCascade (programmatic)
     @Programmatic
@@ -74,7 +86,6 @@ public class CategoryRepository {
     }
 
     //endregion
-
 
     //region > findByParentAndName (programmatic)
     @Programmatic

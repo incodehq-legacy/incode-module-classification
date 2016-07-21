@@ -17,10 +17,14 @@
 package org.incode.module.classification.integtests.category;
 
 import org.incode.module.classification.dom.impl.applicability.ApplicabilityRepository;
+import org.incode.module.classification.dom.impl.category.Category;
 import org.incode.module.classification.dom.impl.category.CategoryRepository;
+import org.incode.module.classification.dom.impl.category.taxonomy.Taxonomy;
 import org.incode.module.classification.dom.impl.classification.ClassificationRepository;
 import org.incode.module.classification.dom.spi.ApplicationTenancyService;
 import org.incode.module.classification.fixture.dom.demo.first.DemoObjectMenu;
+import org.incode.module.classification.fixture.scripts.scenarios.ClassifiedDemoObjectsFixture;
+import org.incode.module.classification.fixture.scripts.teardown.ClassificationDemoAppTearDownFixture;
 import org.incode.module.classification.integtests.ClassificationModuleIntegTest;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -43,14 +47,16 @@ public class Category_addChild_IntegTest extends ClassificationModuleIntegTest {
 
     @Before
     public void setUpData() throws Exception {
-        // fixtureScripts.runFixtureScript(new ClassificationDemoAppTearDownFixture(), null);
-        // fixtureScripts.runFixtureScript(new ClassifiedDemoObjectsFixture(), null);
+         fixtureScripts.runFixtureScript(new ClassificationDemoAppTearDownFixture(), null);
+         fixtureScripts.runFixtureScript(new ClassifiedDemoObjectsFixture(), null);
     }
 
     @Ignore
     public void happy_case() {
 
         // eg given "Italian Colours", can create new "Orange" colour as child
+        // given
+
 
     }
 
