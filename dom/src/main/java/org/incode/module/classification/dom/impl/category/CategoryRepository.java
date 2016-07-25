@@ -61,8 +61,8 @@ public class CategoryRepository {
 
     //region > findByName (programmatic)
     @Programmatic
-    public List<Category> findByName(final String name) {
-        return repositoryService.allMatches(
+    public Category findByName(final String name) {
+        return repositoryService.uniqueMatch(
                 new QueryDefault<>(Category.class,
                         "findByName",
                         "name", name));

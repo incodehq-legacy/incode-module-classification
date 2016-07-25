@@ -16,63 +16,115 @@
  */
 package org.incode.module.classification.integtests.category;
 
+import java.util.SortedSet;
+
+import javax.inject.Inject;
+
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
+import org.apache.isis.applib.services.wrapper.InvalidException;
+
 import org.incode.module.classification.dom.impl.applicability.ApplicabilityRepository;
 import org.incode.module.classification.dom.impl.category.Category;
 import org.incode.module.classification.dom.impl.category.CategoryRepository;
-import org.incode.module.classification.dom.impl.category.taxonomy.Taxonomy;
 import org.incode.module.classification.dom.impl.classification.ClassificationRepository;
 import org.incode.module.classification.dom.spi.ApplicationTenancyService;
 import org.incode.module.classification.fixture.dom.demo.first.DemoObjectMenu;
 import org.incode.module.classification.fixture.scripts.scenarios.ClassifiedDemoObjectsFixture;
 import org.incode.module.classification.fixture.scripts.teardown.ClassificationDemoAppTearDownFixture;
 import org.incode.module.classification.integtests.ClassificationModuleIntegTest;
-import org.junit.Before;
-import org.junit.Ignore;
 
-import javax.inject.Inject;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class Category_addChild_IntegTest extends ClassificationModuleIntegTest {
 
     @Inject
     ClassificationRepository classificationRepository;
+
     @Inject
     CategoryRepository categoryRepository;
+
     @Inject
     ApplicabilityRepository applicabilityRepository;
 
     @Inject
     DemoObjectMenu demoObjectMenu;
+
     @Inject
     ApplicationTenancyService applicationTenancyService;
 
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+
+    Category italianColours;
+
     @Before
     public void setUpData() throws Exception {
-         fixtureScripts.runFixtureScript(new ClassificationDemoAppTearDownFixture(), null);
-         fixtureScripts.runFixtureScript(new ClassifiedDemoObjectsFixture(), null);
+        fixtureScripts.runFixtureScript(new ClassificationDemoAppTearDownFixture(), null);
+        fixtureScripts.runFixtureScript(new ClassifiedDemoObjectsFixture(), null);
+        italianColours = categoryRepository.findByName("Italian Colours");
     }
 
-    @Ignore
+    @Test
     public void happy_case() {
-
-        // eg given "Italian Colours", can create new "Orange" colour as child
         // given
+        assertThat(italianColours.getChildren().size()).isEqualTo(3);
 
+        // when
+        wrap(italianColours).addChild("Orange", "ORANGE", null);
 
+        // then
+        assertThat(italianColours.getChildren().size()).isEqualTo(4);
     }
 
-    @Ignore
+    @Test
     public void cannot_create_a_child_with_same_name_as_some_other_child() {
+        // For some reason, Java 8 lambda's do not result in found names of children
+        // Same goes for validation of addChild
 
-        // eg given "Italian Colours", cannot add child with name of "Green"
+        // given
+        SortedSet<Category> children = italianColours.getChildren();
+        boolean containsName = false;
+        for (Category child : children) {
+            if (child.getName().equals("Red")) {
+                containsName = true;
+            }
+        }
+        assertThat(containsName).isTrue();
 
+        // then
+        expectedException.expect(InvalidException.class);
+        expectedException.expectMessage("There is already a child classification with the name of \'Red\'");
+
+        // when
+        wrap(italianColours).addChild("Red", "NEWRED", null);
     }
 
     @Ignore
     public void cannot_create_a_child_with_same_reference_as_some_other_child() {
+        // For some reason, Java 8 lambda's do not result in found names of children
+        // Same goes for validation of addChild
 
-        // eg given "Italian Colours", cannot add child with reference of "GREEN"
+        // given
+        SortedSet<Category> children = italianColours.getChildren();
+        boolean containsReference = false;
+        for (Category child : children) {
+            if (child.getReference().equals("GREEN")) {
+                containsReference = true;
+            }
+        }
+        assertThat(containsReference).isTrue();
 
+        // then
+        expectedException.expect(InvalidException.class);
+        expectedException.expectMessage("There is already a child classification with the reference of \'GREEN\'");
+
+        //when
+        wrap(italianColours).addChild("New Green", "GREEN", null);
     }
-
 
 }

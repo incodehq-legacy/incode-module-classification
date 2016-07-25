@@ -1,23 +1,45 @@
 package org.incode.module.classification.dom.impl.category;
 
-import com.google.common.eventbus.Subscribe;
-import lombok.Getter;
-import lombok.Setter;
-import org.apache.isis.applib.AbstractSubscriber;
-import org.apache.isis.applib.annotation.*;
-import org.apache.isis.applib.annotation.Collection;
-import org.apache.isis.applib.services.i18n.TranslatableString;
-import org.apache.isis.applib.services.repository.RepositoryService;
-import org.apache.isis.applib.util.ObjectContracts;
-import org.axonframework.eventhandling.annotation.EventHandler;
-import org.incode.module.classification.dom.ClassificationModule;
-import org.incode.module.classification.dom.impl.category.taxonomy.Taxonomy;
+import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-import javax.jdo.annotations.*;
-import java.util.*;
-import java.util.Optional;
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.DiscriminatorStrategy;
+import javax.jdo.annotations.IdGeneratorStrategy;
+import javax.jdo.annotations.IdentityType;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.VersionStrategy;
+
+import com.google.common.eventbus.Subscribe;
+
+import org.axonframework.eventhandling.annotation.EventHandler;
+
+import org.apache.isis.applib.AbstractSubscriber;
+import org.apache.isis.applib.annotation.Action;
+import org.apache.isis.applib.annotation.ActionLayout;
+import org.apache.isis.applib.annotation.Collection;
+import org.apache.isis.applib.annotation.DomainObject;
+import org.apache.isis.applib.annotation.DomainObjectLayout;
+import org.apache.isis.applib.annotation.DomainService;
+import org.apache.isis.applib.annotation.Editing;
+import org.apache.isis.applib.annotation.MemberOrder;
+import org.apache.isis.applib.annotation.NatureOfService;
+import org.apache.isis.applib.annotation.ParameterLayout;
+import org.apache.isis.applib.annotation.Property;
+import org.apache.isis.applib.annotation.PropertyLayout;
+import org.apache.isis.applib.annotation.SemanticsOf;
+import org.apache.isis.applib.services.i18n.TranslatableString;
+import org.apache.isis.applib.services.repository.RepositoryService;
+import org.apache.isis.applib.util.ObjectContracts;
+
+import org.incode.module.classification.dom.ClassificationModule;
+import org.incode.module.classification.dom.impl.category.taxonomy.Taxonomy;
+
+import lombok.Getter;
+import lombok.Setter;
 
 @javax.jdo.annotations.PersistenceCapable(
         schema = "incodeClassification",
@@ -66,10 +88,10 @@ import java.util.Optional;
 })
 @javax.jdo.annotations.Uniques({
         @javax.jdo.annotations.Unique(
-                name="Classification_fullyQualifiedName_UNQ",
+                name = "Classification_fullyQualifiedName_UNQ",
                 members = { "fullyQualifiedName" }),
         @javax.jdo.annotations.Unique(
-                name="Classification_parent_Name_UNQ",
+                name = "Classification_parent_Name_UNQ",
                 members = { "parent", "name" })
 })
 @DomainObject()
@@ -81,18 +103,29 @@ import java.util.Optional;
 public class Category implements Comparable<Category> {
 
     //region > ui event classes
-    public static class TitleUiEvent extends ClassificationModule.TitleUiEvent<Category>{}
-    public static class IconUiEvent extends ClassificationModule.IconUiEvent<Category>{}
-    public static class CssClassUiEvent extends ClassificationModule.CssClassUiEvent<Category>{}
+    public static class TitleUiEvent extends ClassificationModule.TitleUiEvent<Category> {
+    }
+
+    public static class IconUiEvent extends ClassificationModule.IconUiEvent<Category> {
+    }
+
+    public static class CssClassUiEvent extends ClassificationModule.CssClassUiEvent<Category> {
+    }
     //endregion
 
     //region > event classes
-    public static abstract class PropertyDomainEvent<T> extends ClassificationModule.PropertyDomainEvent<Category, T> { }
-    public static abstract class CollectionDomainEvent<T> extends ClassificationModule.CollectionDomainEvent<Category, T> { }
-    public static abstract class ActionDomainEvent extends ClassificationModule.ActionDomainEvent<Category> { }
+    public static abstract class PropertyDomainEvent<T> extends ClassificationModule.PropertyDomainEvent<Category, T> {
+    }
+
+    public static abstract class CollectionDomainEvent<T> extends ClassificationModule.CollectionDomainEvent<Category, T> {
+    }
+
+    public static abstract class ActionDomainEvent extends ClassificationModule.ActionDomainEvent<Category> {
+    }
     //endregion
 
     //region > title, icon, cssClass
+
     /**
      * Implemented as a subscriber so can be overridden by consuming application if required.
      */
@@ -101,11 +134,12 @@ public class Category implements Comparable<Category> {
         @EventHandler
         @Subscribe
         public void on(Category.TitleUiEvent ev) {
-            if(ev.getTitle() != null) {
+            if (ev.getTitle() != null) {
                 return;
             }
             ev.setTitle(titleOf(ev.getSource()));
         }
+
         private String titleOf(final Category category) {
             return category.getFullyQualifiedName() +
                     (category.getReference() != null
@@ -119,7 +153,7 @@ public class Category implements Comparable<Category> {
         @EventHandler
         @Subscribe
         public void on(Category.IconUiEvent ev) {
-            if(ev.getIconName() != null) {
+            if (ev.getIconName() != null) {
                 return;
             }
             ev.setIconName("");
@@ -134,14 +168,13 @@ public class Category implements Comparable<Category> {
         @EventHandler
         @Subscribe
         public void on(Category.CssClassUiEvent ev) {
-            if(ev.getCssClass() != null) {
+            if (ev.getCssClass() != null) {
                 return;
             }
             ev.setCssClass("");
         }
     }
     //endregion
-
 
     //region > constructor
     protected Category(
@@ -150,11 +183,11 @@ public class Category implements Comparable<Category> {
             final String reference,
             final Integer ordinal) {
 
-        setTaxonomy(parent != null ? parent.getTaxonomy(): null);
+        setTaxonomy(parent != null ? parent.getTaxonomy() : null);
         setParent(parent);
         setName(name);
         setReference(reference);
-        setOrdinal(ordinal != null? ordinal: 0);
+        setOrdinal(ordinal != null ? ordinal : 0);
 
         deriveFullyQualifiedName();
         deriveFullyQualifiedOrdinal();
@@ -167,18 +200,19 @@ public class Category implements Comparable<Category> {
     }
 
     private static void prependName(Category category, final StringBuilder buf) {
-        while(category != null) {
+        while (category != null) {
             prependNameOf(category, buf);
             category = category.getParent();
         }
     }
 
     private static void prependNameOf(final Category category, final StringBuilder buf) {
-        if(buf.length() > 0) {
+        if (buf.length() > 0) {
             buf.insert(0, "/");
         }
         buf.insert(0, category.getName());
     }
+
     private void deriveFullyQualifiedOrdinal() {
         StringBuilder buf = new StringBuilder();
         prependOrdinal(this, buf);
@@ -186,22 +220,24 @@ public class Category implements Comparable<Category> {
     }
 
     private static void prependOrdinal(Category category, final StringBuilder buf) {
-        while(category != null) {
+        while (category != null) {
             prependOrdinalOf(category, buf);
             category = category.getParent();
         }
     }
+
     private static void prependOrdinalOf(final Category category, final StringBuilder buf) {
-        if(buf.length() > 0) {
+        if (buf.length() > 0) {
             buf.insert(0, ".");
         }
         buf.insert(0, category.getOrdinal());
     }
     //endregion
 
-
     //region > taxonomy (property)
-    public static class TaxonomyDomainEvent extends PropertyDomainEvent<Category> { }
+    public static class TaxonomyDomainEvent extends PropertyDomainEvent<Category> {
+    }
+
     @Column(allowsNull = "true", name = "taxonomyId") // conceptually, not-null; however a taxonomy will refer to itself
     @Property(
             domainEvent = TaxonomyDomainEvent.class,
@@ -212,7 +248,9 @@ public class Category implements Comparable<Category> {
     //endregion
 
     //region > fullyQualifiedName (derived property, persisted)
-    public static class FullyQualifiedNameDomainEvent extends PropertyDomainEvent<String> { }
+    public static class FullyQualifiedNameDomainEvent extends PropertyDomainEvent<String> {
+    }
+
     @Getter @Setter
     @javax.jdo.annotations.Column(allowsNull = "false", length = ClassificationModule.JdoColumnLength.CATEGORY_FQNAME)
     @Property(
@@ -223,7 +261,9 @@ public class Category implements Comparable<Category> {
     //endregion
 
     //region > parent (property)
-    public static class ParentDomainEvent extends PropertyDomainEvent<Category> { }
+    public static class ParentDomainEvent extends PropertyDomainEvent<Category> {
+    }
+
     @Column(allowsNull = "true", name = "parentId")
     @Property(
             domainEvent = ParentDomainEvent.class,
@@ -238,14 +278,17 @@ public class Category implements Comparable<Category> {
     //endregion
 
     //region > name (property)
-    public static class NameDomainEvent extends PropertyDomainEvent<String> { }
+    public static class NameDomainEvent extends PropertyDomainEvent<String> {
+    }
+
     @Getter @Setter
     @javax.jdo.annotations.Column(allowsNull = "false", length = ClassificationModule.JdoColumnLength.CATEGORY_NAME)
     @Property(domainEvent = NameDomainEvent.class)
     private String name;
 
     public TranslatableString validateName(final String name) {
-        if (name == null) return null;
+        if (name == null)
+            return null;
         final Category existingCategoryIfAny = categoryRepository.findByParentAndName(getParent(), name);
         return existingCategoryIfAny != null
                 ? TranslatableString.tr("A category with name '{name}' already exists (under this parent)", "name", name)
@@ -260,6 +303,7 @@ public class Category implements Comparable<Category> {
             childCategory.deriveFullyQualifiedName();
         }
     }
+
     public void clearName() {
         modifyName(null);
     }
@@ -267,7 +311,8 @@ public class Category implements Comparable<Category> {
     //endregion
 
     //region > reference (property)
-    public static class ReferenceDomainEvent extends PropertyDomainEvent<String> { }
+    public static class ReferenceDomainEvent extends PropertyDomainEvent<String> {
+    }
 
     /**
      * Optional reference.
@@ -278,7 +323,8 @@ public class Category implements Comparable<Category> {
     private String reference;
 
     public TranslatableString validateReference(final String reference) {
-        if (reference == null) return null;
+        if (reference == null)
+            return null;
         final Category existingCategoryIfAny = categoryRepository.findByParentAndReference(getParent(), reference);
         return existingCategoryIfAny != null
                 ? TranslatableString.tr("A category with reference '{reference}' already exists (under this parent)", "reference", reference)
@@ -287,7 +333,9 @@ public class Category implements Comparable<Category> {
     //endregion
 
     //region > fullyQualifiedName (derived property, persisted)
-    public static class FullyQualifiedOrdinalDomainEvent extends PropertyDomainEvent<String> { }
+    public static class FullyQualifiedOrdinalDomainEvent extends PropertyDomainEvent<String> {
+    }
+
     @Getter @Setter
     @javax.jdo.annotations.Column(allowsNull = "false", length = ClassificationModule.JdoColumnLength.CATEGORY_FQORDINAL)
     @Property(
@@ -297,9 +345,9 @@ public class Category implements Comparable<Category> {
     private String fullyQualifiedOrdinal;
     //endregion
 
-
     //region > ordinal (property)
-    public static class OrdinalDomainEvent extends PropertyDomainEvent<Integer> { }
+    public static class OrdinalDomainEvent extends PropertyDomainEvent<Integer> {
+    }
 
     /**
      * Optional ordinal.
@@ -316,19 +364,19 @@ public class Category implements Comparable<Category> {
     private Integer ordinal;
 
     public void modifyOrdinal(final Integer ordinal) {
-        setOrdinal(ordinal != null? ordinal: 0);
+        setOrdinal(ordinal != null ? ordinal : 0);
         deriveFullyQualifiedOrdinal();
         List<Category> childCategories = categoryRepository.findByParentCascade(this);
         for (Category childCategory : childCategories) {
             childCategory.deriveFullyQualifiedOrdinal();
         }
     }
+
     public void clearOrdinal() {
         modifyOrdinal(null);
     }
 
     //endregion
-
 
     //region > children (property)
     @Persistent(mappedBy = "parent", dependentElement = "false")
@@ -358,25 +406,54 @@ public class Category implements Comparable<Category> {
     }
 
     public TranslatableString validate0AddChild(final String name) {
-        final Optional<Category> any =
-                getChildren().stream().filter(x -> Objects.equals(x.getName(), name)).findAny();
-        return any.isPresent()
-                ? TranslatableString.tr(
+        // Java8 lambda's do not seem to work on the name, for some reason.
+        // No matches are found using lambda's, whereas a normal iteration does.
+
+        //        final Optional<Category> any =
+        //                getChildren().stream().filter(x -> Objects.equals(x.getName(), name)).findAny();
+        //        return any.isPresent()
+        //                ? TranslatableString.tr(
+        //                        "There is already a child classification with the name of '{name}'",
+        //                        "name", name)
+        //                : null;
+        final SortedSet<Category> children = getChildren();
+        for (Category child : children) {
+            if (child.getName().equals(name)) {
+                return TranslatableString.tr(
                         "There is already a child classification with the name of '{name}'",
-                        "name", name)
-                : null;
+                        "name", name);
+            }
+        }
+
+        return null;
     }
+
     public TranslatableString validate1AddChild(final String reference) {
-        if(reference == null) {
+        if (reference == null) {
             return null;
         }
-        final Optional<Category> any =
-                getChildren().stream().filter(x -> Objects.equals(x.getReference(), reference)).findAny();
-        return any.isPresent()
-                ? TranslatableString.tr(
-                "There is already a child classification with the reference of '{reference}'",
-                "reference", reference)
-                : null;
+
+        // Java8 lambda's do not seem to work on the name, for some reason.
+        // No matches are found using lambda's, whereas a normal iteration does.
+
+        //        final Optional<Category> any =
+        //                getChildren().stream().filter(x -> Objects.equals(x.getReference(), reference)).findAny();
+        //        return any.isPresent()
+        //                ? TranslatableString.tr(
+        //                "There is already a child classification with the reference of '{reference}'",
+        //                "reference", reference)
+        //                : null;
+
+        final SortedSet<Category> children = getChildren();
+        for (Category child : children) {
+            if (child.getReference().equals(reference)) {
+                return TranslatableString.tr(
+                        "There is already a child classification with the reference of '{reference}'",
+                        "reference", reference);
+            }
+        }
+
+        return null;
     }
     // endregion
 
@@ -397,19 +474,18 @@ public class Category implements Comparable<Category> {
         return getChildren();
     }
 
-
     // endregion
 
-
     //region > all (derived collection)
-    public static class AllDomainEvent extends CollectionDomainEvent<Category> { }
+    public static class AllDomainEvent extends CollectionDomainEvent<Category> {
+    }
+
     @javax.jdo.annotations.NotPersistent
     @Collection(notPersisted = true, editing = Editing.DISABLED)
     public List<Category> getAll() {
         return categoryRepository.findByParentCascade(this);
     }
     //endregion
-
 
     //region > toString, compareTo
 
@@ -425,7 +501,6 @@ public class Category implements Comparable<Category> {
 
     //endregion
 
-
     //region > injected services
 
     @Inject
@@ -434,6 +509,5 @@ public class Category implements Comparable<Category> {
     protected CategoryRepository categoryRepository;
 
     //endregion
-
 
 }
