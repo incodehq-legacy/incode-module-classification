@@ -21,7 +21,6 @@ import java.util.SortedSet;
 import javax.inject.Inject;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -44,16 +43,13 @@ public class Category_addChild_IntegTest extends ClassificationModuleIntegTest {
 
     @Inject
     ClassificationRepository classificationRepository;
-
     @Inject
     CategoryRepository categoryRepository;
-
     @Inject
     ApplicabilityRepository applicabilityRepository;
 
     @Inject
     DemoObjectMenu demoObjectMenu;
-
     @Inject
     ApplicationTenancyService applicationTenancyService;
 
@@ -104,7 +100,7 @@ public class Category_addChild_IntegTest extends ClassificationModuleIntegTest {
         wrap(italianColours).addChild("Red", "NEWRED", null);
     }
 
-    @Ignore
+    @Test
     public void cannot_create_a_child_with_same_reference_as_some_other_child() {
         // For some reason, Java 8 lambda's do not result in found names of children
         // Same goes for validation of addChild

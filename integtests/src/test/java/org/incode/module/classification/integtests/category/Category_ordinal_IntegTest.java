@@ -16,17 +16,21 @@
  */
 package org.incode.module.classification.integtests.category;
 
+import javax.inject.Inject;
+
+import org.junit.Before;
+import org.junit.Test;
+
 import org.incode.module.classification.dom.impl.applicability.ApplicabilityRepository;
+import org.incode.module.classification.dom.impl.category.Category;
 import org.incode.module.classification.dom.impl.category.CategoryRepository;
 import org.incode.module.classification.dom.impl.classification.ClassificationRepository;
 import org.incode.module.classification.dom.spi.ApplicationTenancyService;
 import org.incode.module.classification.fixture.dom.demo.first.DemoObjectMenu;
 import org.incode.module.classification.fixture.scripts.scenarios.ClassifiedDemoObjectsFixture;
 import org.incode.module.classification.integtests.ClassificationModuleIntegTest;
-import org.junit.Before;
-import org.junit.Ignore;
 
-import javax.inject.Inject;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class Category_ordinal_IntegTest extends ClassificationModuleIntegTest {
 
@@ -44,29 +48,58 @@ public class Category_ordinal_IntegTest extends ClassificationModuleIntegTest {
 
     @Before
     public void setUpData() throws Exception {
-         fixtureScripts.runFixtureScript(new ClassifiedDemoObjectsFixture(), null);
+        fixtureScripts.runFixtureScript(new ClassifiedDemoObjectsFixture(), null);
     }
 
-
-    @Ignore
+    @Test
     public void happy_case() {
-
         // eg given "Sizes/Medium", can change ordinal to 99.  The fully qualified name should be updated
+        // TODO: I'm assuming this was meant to be that the fully qualified ordinal should be updated
 
+        // given
+        Category medium = categoryRepository.findByReference("M");
+        assertThat(medium.getFullyQualifiedOrdinal()).isEqualTo("1.2");
+
+        // when
+        medium.modifyOrdinal(99);
+
+        // then
+        assertThat(medium.getFullyQualifiedOrdinal()).isEqualTo("1.99");
     }
 
-    @Ignore
+    @Test
     public void fully_qualified_name_of_children_also_updated() {
+        // given
+        Category large = categoryRepository.findByReference("LGE");
+        assertThat(large.getFullyQualifiedOrdinal()).isEqualTo("1.1");
+        for (Category child : large.getChildren()) {
+            assertThat(child.getFullyQualifiedOrdinal().split("\\.")[1]).isEqualTo("1");
+        }
 
-        // eg given "Sizes/Large", can change ordinal to 99.  The fully qualified ordinal should be updated of "Sizes/LRG", and also that of the three children
+        // when
+        large.modifyOrdinal(99);
 
+        // then
+        assertThat(large.getFullyQualifiedOrdinal()).isEqualTo("1.99");
+        for (Category child : large.getChildren()) {
+            assertThat(child.getFullyQualifiedOrdinal().split("\\.")[1]).isEqualTo("99");
+        }
     }
 
-    @Ignore
+    @Test
     public void can_clear() {
-
+        // TODO: Should the ordinal be set to '1.3.0' as asserted below, or set to '0'?
         // eg given "Sizes/Small/Smallest" ("XXS"), can set ordinal to null.  It should be set to 0.
 
+        // given
+        Category smallest = categoryRepository.findByReference("XXS");
+        assertThat(smallest.getFullyQualifiedOrdinal()).isEqualTo("1.3.3");
+
+        // when
+        smallest.clearOrdinal();
+
+        // then
+        assertThat(smallest.getFullyQualifiedOrdinal()).isEqualTo("1.3.0");
     }
 
 }

@@ -75,20 +75,25 @@ public class Category_name_IntegTest extends ClassificationModuleIntegTest {
         // given
         Category large = categoryRepository.findByReference("LGE");
         assertThat(large.getFullyQualifiedName()).isEqualTo("Sizes/Large");
-        assertThat(large.getChildren().first().getFullyQualifiedName()).isEqualTo("Sizes/Large/Large");
+        for (Category child : large.getChildren()) {
+            assertThat(child.getFullyQualifiedName().split("/")[1]).isEqualTo("Large");
+        }
 
         // when
         large.modifyName("LRG");
 
         // then
         assertThat(large.getFullyQualifiedName()).isEqualTo("Sizes/LRG");
-        assertThat(large.getChildren().first().getFullyQualifiedName()).isEqualTo("Sizes/LRG/Large");
+        for (Category child : large.getChildren()) {
+            assertThat(child.getFullyQualifiedName().split("/")[1]).isEqualTo("LRG");
+        }
     }
 
-    @Ignore("Expected is that validateName on Category would validate for modifyName, but doesn't seem to be the case. Is this correct behaviour?")
+    @Ignore
     public void cannot_rename_to_a_name_already_in_use() {
-
+        // TODO: Expected is that validateName on Category would validate for modifyName, but doesn't seem to be the case. Is this correct behaviour?
         // eg given "French Colours/Red", cannot rename to "French Colours/White"
+        
         // given
         Category red = categoryRepository.findByReference("FRRED");
 
