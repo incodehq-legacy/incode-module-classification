@@ -68,6 +68,7 @@ public class ClassifiedDemoObjectsFixture extends DiscoverableFixtureScript {
 
         // italian taxonomy applicable only to Italian DemoObject and OtherObject
         Taxonomy italianColours = categoryRepository.createTaxonomy("Italian Colours");
+        italianColours.setReference("ITACOL");
         Category italianRed = italianColours.addChild("Red", "RED", null);
         Category italianGreen = italianColours.addChild("Green", "GREEN", null);
         Category italianWhite = italianColours.addChild("White", "WHITE", null);
@@ -77,9 +78,9 @@ public class ClassifiedDemoObjectsFixture extends DiscoverableFixtureScript {
 
         // french taxonomy applicable only to French DemoObject (and not to OtherObject even if with FRA app tenancy)
         Taxonomy frenchColours = categoryRepository.createTaxonomy("French Colours");
-        Category frenchRed = frenchColours.addChild("Red", null, null);
-        Category frenchWhite = frenchColours.addChild("White", null, null);
-        Category frenchBlue = frenchColours.addChild("Blue", null, null);
+        Category frenchRed = frenchColours.addChild("Red", "FRRED", null);
+        Category frenchWhite = frenchColours.addChild("White", "FRWHITE", null);
+        Category frenchBlue = frenchColours.addChild("Blue", "FRBLUE", null);
 
         wrap(frenchColours).applicable("/FRA", DemoObject.class.getName());
 

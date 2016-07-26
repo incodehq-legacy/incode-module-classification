@@ -59,13 +59,13 @@ public class CategoryRepository {
     }
     //endregion
 
-    //region > findByName (programmatic)
+    //region > findByReference (programmatic)
     @Programmatic
-    public Category findByName(final String name) {
+    public Category findByReference(final String reference) {
         return repositoryService.uniqueMatch(
                 new QueryDefault<>(Category.class,
-                        "findByName",
-                        "name", name));
+                        "findByReference",
+                        "reference", reference));
     }
     //endregion
 

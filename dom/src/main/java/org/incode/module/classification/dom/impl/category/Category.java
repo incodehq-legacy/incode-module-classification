@@ -66,10 +66,10 @@ import lombok.Setter;
                         + "WHERE parent == :parent "
                         + "ORDER BY fullyQualifiedOrdinal "),
         @javax.jdo.annotations.Query(
-                name = "findByName", language = "JDOQL",
+                name = "findByReference", language = "JDOQL",
                 value = "SELECT "
                         + "FROM org.incode.module.classification.dom.impl.category.Category "
-                        + "WHERE name == :name "
+                        + "WHERE reference == :reference "
                         + "ORDER BY fullyQualifiedOrdinal "),
         @javax.jdo.annotations.Query(
                 name = "findByParentAndName", language = "JDOQL",
@@ -303,6 +303,8 @@ public class Category implements Comparable<Category> {
             childCategory.deriveFullyQualifiedName();
         }
     }
+
+//    public TranslatableString validateModifyName
 
     public void clearName() {
         modifyName(null);

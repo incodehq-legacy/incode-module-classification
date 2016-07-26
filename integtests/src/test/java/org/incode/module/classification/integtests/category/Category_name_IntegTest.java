@@ -16,16 +16,25 @@
  */
 package org.incode.module.classification.integtests.category;
 
+import javax.inject.Inject;
+
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+
+import org.apache.isis.applib.services.wrapper.InvalidException;
+
 import org.incode.module.classification.dom.impl.applicability.ApplicabilityRepository;
+import org.incode.module.classification.dom.impl.category.Category;
 import org.incode.module.classification.dom.impl.category.CategoryRepository;
 import org.incode.module.classification.dom.impl.classification.ClassificationRepository;
 import org.incode.module.classification.dom.spi.ApplicationTenancyService;
 import org.incode.module.classification.fixture.dom.demo.first.DemoObjectMenu;
+import org.incode.module.classification.fixture.scripts.scenarios.ClassifiedDemoObjectsFixture;
+import org.incode.module.classification.fixture.scripts.teardown.ClassificationDemoAppTearDownFixture;
 import org.incode.module.classification.integtests.ClassificationModuleIntegTest;
-import org.junit.Before;
-import org.junit.Ignore;
 
-import javax.inject.Inject;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class Category_name_IntegTest extends ClassificationModuleIntegTest {
 
@@ -43,32 +52,53 @@ public class Category_name_IntegTest extends ClassificationModuleIntegTest {
 
     @Before
     public void setUpData() throws Exception {
-        // fixtureScripts.runFixtureScript(new ClassificationDemoAppTearDownFixture(), null);
-        // fixtureScripts.runFixtureScript(new ClassifiedDemoObjectsFixture(), null);
+        fixtureScripts.runFixtureScript(new ClassificationDemoAppTearDownFixture(), null);
+        fixtureScripts.runFixtureScript(new ClassifiedDemoObjectsFixture(), null);
     }
 
-
-    @Ignore
+    @Test
     public void happy_case() {
+        // given
+        Category medium = categoryRepository.findByReference("M");
+        assertThat(medium.getFullyQualifiedName()).isEqualTo("Sizes/Medium");
 
-        // eg given "Sizes/Medium", can rename to "Middle".  The fully qualified name should be updated
+        // when
+        medium.modifyName("Middle");
 
+        // then
+        assertThat(medium.getName()).isEqualTo("Middle");
+        assertThat(medium.getFullyQualifiedName()).isEqualTo("Sizes/Middle");
     }
 
-    @Ignore
+    @Test
     public void fully_qualified_name_of_children_also_updated() {
+        // given
+        Category large = categoryRepository.findByReference("LGE");
+        assertThat(large.getFullyQualifiedName()).isEqualTo("Sizes/Large");
+        assertThat(large.getChildren().first().getFullyQualifiedName()).isEqualTo("Sizes/Large/Large");
 
-        // eg given "Sizes/Large", can rename to "LRG".  The fully qualified name should be updated of "Sizes/LRG", and also that of the three children
+        // when
+        large.modifyName("LRG");
 
+        // then
+        assertThat(large.getFullyQualifiedName()).isEqualTo("Sizes/LRG");
+        assertThat(large.getChildren().first().getFullyQualifiedName()).isEqualTo("Sizes/LRG/Large");
     }
 
-    @Ignore
+    @Ignore("Expected is that validateName on Category would validate for modifyName, but doesn't seem to be the case. Is this correct behaviour?")
     public void cannot_rename_to_a_name_already_in_use() {
 
         // eg given "French Colours/Red", cannot rename to "French Colours/White"
+        // given
+        Category red = categoryRepository.findByReference("FRRED");
+
+        // then
+        expectedException.expect(InvalidException.class);
+        expectedException.expectMessage("A category with name 'White' already exists (under this parent)");
+
+        // when
+        red.modifyName("White");
 
     }
-
-
 
 }

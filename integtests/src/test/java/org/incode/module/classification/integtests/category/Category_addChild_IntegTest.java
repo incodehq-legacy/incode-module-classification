@@ -66,7 +66,7 @@ public class Category_addChild_IntegTest extends ClassificationModuleIntegTest {
     public void setUpData() throws Exception {
         fixtureScripts.runFixtureScript(new ClassificationDemoAppTearDownFixture(), null);
         fixtureScripts.runFixtureScript(new ClassifiedDemoObjectsFixture(), null);
-        italianColours = categoryRepository.findByName("Italian Colours");
+        italianColours = categoryRepository.findByReference("ITACOL");
     }
 
     @Test
