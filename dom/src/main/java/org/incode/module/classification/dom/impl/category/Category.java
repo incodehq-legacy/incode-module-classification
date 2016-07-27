@@ -37,6 +37,7 @@ import org.apache.isis.applib.util.ObjectContracts;
 
 import org.incode.module.classification.dom.ClassificationModule;
 import org.incode.module.classification.dom.impl.category.taxonomy.Taxonomy;
+import org.incode.module.classification.dom.impl.classification.ClassificationRepository;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -304,7 +305,7 @@ public class Category implements Comparable<Category> {
         }
     }
 
-//    public TranslatableString validateModifyName
+    //    public TranslatableString validateModifyName
 
     public void clearName() {
         modifyName(null);
@@ -476,6 +477,14 @@ public class Category implements Comparable<Category> {
         return getChildren();
     }
 
+    public TranslatableString validateRemoveChild(final Category category) {
+        //        List<Classification> classifications = classificationRepository.findByCategory(category);
+        //        return classifications.isEmpty() ? null : TranslatableString.tr("This child is classified by '{object}' and cannot be removed",
+        //                "object", classifications.get(0).getClassified().toString());
+
+        return categoryRepository.validateRemoveCascade(category);
+    }
+
     // endregion
 
     //region > all (derived collection)
@@ -509,6 +518,8 @@ public class Category implements Comparable<Category> {
     protected RepositoryService repositoryService;
     @Inject
     protected CategoryRepository categoryRepository;
+    @Inject
+    protected ClassificationRepository classificationRepository;
 
     //endregion
 

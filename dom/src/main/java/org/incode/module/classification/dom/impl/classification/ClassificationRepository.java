@@ -18,6 +18,10 @@
  */
 package org.incode.module.classification.dom.impl.classification;
 
+import java.util.List;
+
+import javax.inject.Inject;
+
 import org.apache.isis.applib.annotation.DomainService;
 import org.apache.isis.applib.annotation.NatureOfService;
 import org.apache.isis.applib.annotation.Programmatic;
@@ -26,12 +30,9 @@ import org.apache.isis.applib.services.bookmark.Bookmark;
 import org.apache.isis.applib.services.bookmark.BookmarkService;
 import org.apache.isis.applib.services.registry.ServiceRegistry;
 import org.apache.isis.applib.services.repository.RepositoryService;
+
 import org.incode.module.classification.dom.impl.category.Category;
 import org.incode.module.classification.dom.impl.category.taxonomy.Taxonomy;
-
-import javax.inject.Inject;
-import java.util.List;
-
 
 @DomainService(
         nature = NatureOfService.DOMAIN,
@@ -63,6 +64,17 @@ public class ClassificationRepository {
     }
     //endregion
 
+    //region > findByCategory (programmatic)
+    @Programmatic
+    public List<Classification> findByCategory(
+            final Category category) {
+        return repositoryService.allMatches(
+                new QueryDefault<>(Classification.class,
+                        "findByCategory",
+                        "category", category));
+    }
+    //endregion
+
     //region > create (programmatic)
 
     @Programmatic
@@ -91,7 +103,7 @@ public class ClassificationRepository {
         Class<?> domainClass = classified.getClass();
         for (SubtypeProvider subtypeProvider : subtypeProviders) {
             Class<? extends Classification> subtype = subtypeProvider.subtypeFor(domainClass, taxonomy);
-            if(subtype != null) {
+            if (subtype != null) {
                 return subtype;
             }
         }
@@ -121,9 +133,9 @@ public class ClassificationRepository {
         /**
          * @return the subtype of {@link Classification} to use to hold the (type-safe) classification of the domain object with respect to the provided {@link Taxonomy}.
          */
-        @Programmatic
-        Class<? extends Classification> subtypeFor(Class<?> domainObject, Taxonomy taxonomy);
+        @Programmatic Class<? extends Classification> subtypeFor(Class<?> domainObject, Taxonomy taxonomy);
     }
+
     /**
      * Convenience adapter to help implement the {@link SubtypeProvider} SPI; ignores the {@link Taxonomy} passed into
      * {@link #subtypeClassFor(Taxonomy, Object)}, simply returns the class pair passed into constructor.

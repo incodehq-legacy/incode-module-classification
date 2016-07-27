@@ -58,6 +58,12 @@ import java.util.stream.Collectors;
                 value = "SELECT "
                         + "FROM org.incode.module.classification.dom.impl.classification.Classification "
                         + "WHERE classifiedStr == :classifiedStr "
+                        + "ORDER BY taxonomy, category"),
+        @javax.jdo.annotations.Query(
+                name = "findByCategory", language = "JDOQL",
+                value = "SELECT "
+                        + "FROM org.incode.module.classification.dom.impl.classification.Classification "
+                        + "WHERE category == :category "
                         + "ORDER BY taxonomy, category")
 })
 @javax.jdo.annotations.Indices({

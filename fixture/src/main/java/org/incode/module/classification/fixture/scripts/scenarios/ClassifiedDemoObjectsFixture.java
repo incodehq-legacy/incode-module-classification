@@ -86,6 +86,7 @@ public class ClassifiedDemoObjectsFixture extends DiscoverableFixtureScript {
 
         // global taxonomy applicable only to DemoObject (any app tenancy)
         Taxonomy globalSizes = categoryRepository.createTaxonomy("Sizes");
+        globalSizes.setReference("SIZES");
         Category large = globalSizes.addChild("Large", "LGE", 1);
         Category medium = globalSizes.addChild("Medium", "M", 2);
         Category small = globalSizes.addChild("Small", "SML", 3);

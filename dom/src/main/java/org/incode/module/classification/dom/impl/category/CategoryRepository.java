@@ -29,9 +29,12 @@ import org.apache.isis.applib.annotation.DomainService;
 import org.apache.isis.applib.annotation.NatureOfService;
 import org.apache.isis.applib.annotation.Programmatic;
 import org.apache.isis.applib.query.QueryDefault;
+import org.apache.isis.applib.services.i18n.TranslatableString;
 import org.apache.isis.applib.services.repository.RepositoryService;
 
 import org.incode.module.classification.dom.impl.category.taxonomy.Taxonomy;
+import org.incode.module.classification.dom.impl.classification.Classification;
+import org.incode.module.classification.dom.impl.classification.ClassificationRepository;
 
 @DomainService(
         nature = NatureOfService.DOMAIN,
@@ -140,9 +143,32 @@ public class CategoryRepository {
     }
     //endregion
 
+    //region > validateRemoveCascade (programmatic)
+    @Programmatic
+    public TranslatableString validateRemoveCascade(final Category category) {
+        List<Classification> classifications = classificationRepository.findByCategory(category);
+        if (!classifications.isEmpty()) {
+            return TranslatableString.tr("Child '{child}' is classified by '{object}' and cannot be removed",
+                    "child", category.getFullyQualifiedName(), "object", classifications.get(0).getClassified().toString());
+        } else {
+            SortedSet<Category> children = category.getChildren();
+            for (final Category child : children) {
+                TranslatableString childValidation = validateRemoveCascade(child);
+                if (childValidation != null) {
+                    return childValidation;
+                }
+            }
+
+            return null;
+        }
+    }
+    //endregion
+
     //region > injected
     @Inject
     RepositoryService repositoryService;
+    @Inject
+    ClassificationRepository classificationRepository;
 
     //endregion
 

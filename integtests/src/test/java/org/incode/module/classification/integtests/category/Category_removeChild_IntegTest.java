@@ -16,17 +16,24 @@
  */
 package org.incode.module.classification.integtests.category;
 
+import javax.inject.Inject;
+
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+
+import org.apache.isis.applib.services.wrapper.InvalidException;
+
 import org.incode.module.classification.dom.impl.applicability.ApplicabilityRepository;
+import org.incode.module.classification.dom.impl.category.Category;
 import org.incode.module.classification.dom.impl.category.CategoryRepository;
 import org.incode.module.classification.dom.impl.classification.ClassificationRepository;
 import org.incode.module.classification.dom.spi.ApplicationTenancyService;
 import org.incode.module.classification.fixture.dom.demo.first.DemoObjectMenu;
 import org.incode.module.classification.fixture.scripts.scenarios.ClassifiedDemoObjectsFixture;
 import org.incode.module.classification.integtests.ClassificationModuleIntegTest;
-import org.junit.Before;
-import org.junit.Ignore;
 
-import javax.inject.Inject;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class Category_removeChild_IntegTest extends ClassificationModuleIntegTest {
 
@@ -47,37 +54,68 @@ public class Category_removeChild_IntegTest extends ClassificationModuleIntegTes
         fixtureScripts.runFixtureScript(new ClassifiedDemoObjectsFixture(), null);
     }
 
-
-    @Ignore
+    @Ignore("EST-771")
     public void happy_case() {
+        // TODO: removeChild does not seem to actually remove the child from the parent
 
         // eg given "Sizes/Large", can remove "Largest" child
+        // given
+        Category large = categoryRepository.findByReference("LGE");
+        Category largest = categoryRepository.findByReference("XXL");
+        assertThat(large.getChildren()).contains(largest);
 
+        // when
+        wrap(large).removeChild(largest);
+
+        // then
+        assertThat(large.getChildren()).doesNotContain(largest);
     }
 
-    @Ignore
+    @Ignore("EST-771")
     public void happy_case_cascading() {
+        // TODO: same issue
 
         // eg given "Sizes", can remove "Large" child.  All the children of "Large" should also be removed.
+        // given
+        Category sizes = categoryRepository.findByReference("SIZES");
+        Category large = categoryRepository.findByReference("LGE");
+        assertThat(sizes.getChildren()).contains(large);
+        assertThat(large.getChildren()).isNotEmpty();
 
+        // when
+        wrap(sizes).removeChild(large);
+
+        // then
+        assertThat(sizes.getChildren()).doesNotContain(large);
+        assertThat(large.getChildren()).isEmpty();
     }
 
-    @Ignore
+    @Test
     public void cannot_remove_if_has_classification() {
+        // given
+        Category sizes = categoryRepository.findByReference("SIZES");
+        Category medium = categoryRepository.findByReference("M");
 
-        // eg given "Sizes", cannot remove "Medium" child (used by 'Demo foo (in Italy)').
+        // then
+        expectedException.expect(InvalidException.class);
+        expectedException.expectMessage("Child 'Sizes/Medium' is classified by 'DemoObject{name=Demo foo (in Italy)}' and cannot be removed");
 
-        // nb: currently this is handled by a referential integrity constraint, and this doesn't get rendered particularly well (a bug I think in Isis).  So as a workaround, probably need to add a validateXxx to check explicitly.
-
+        // when
+        wrap(sizes).removeChild(medium);
     }
 
-    @Ignore
+    @Test
     public void cannot_remove_if_child_has_classification() {
+        // given
+        Category sizes = categoryRepository.findByReference("SIZES");
+        Category small = categoryRepository.findByReference("SML");
 
-        // eg given "Sizes", cannot remove "Small" child (because "Small/Smaller" used by 'Demo bar (in France)').
+        // then
+        expectedException.expect(InvalidException.class);
+        expectedException.expectMessage("Child 'Sizes/Small/Smaller' is classified by 'DemoObject{name=Demo bar (in France)}' and cannot be removed");
 
-        // nb: currently this is handled by a referential integrity constraint, and this doesn't get rendered particularly well (a bug I think in Isis).  So as a workaround, probably need to add a validateXxx to check explicitly.
-
+        // when
+        wrap(sizes).removeChild(small);
     }
 
 }
