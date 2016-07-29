@@ -16,17 +16,22 @@
  */
 package org.incode.module.classification.integtests.category;
 
+import javax.inject.Inject;
+
+import org.junit.Before;
+import org.junit.Test;
+
 import org.incode.module.classification.dom.impl.applicability.ApplicabilityRepository;
+import org.incode.module.classification.dom.impl.category.Category;
 import org.incode.module.classification.dom.impl.category.CategoryRepository;
+import org.incode.module.classification.dom.impl.category.taxonomy.Taxonomy;
 import org.incode.module.classification.dom.impl.classification.ClassificationRepository;
 import org.incode.module.classification.dom.spi.ApplicationTenancyService;
 import org.incode.module.classification.fixture.dom.demo.first.DemoObjectMenu;
 import org.incode.module.classification.fixture.scripts.scenarios.ClassifiedDemoObjectsFixture;
 import org.incode.module.classification.integtests.ClassificationModuleIntegTest;
-import org.junit.Before;
-import org.junit.Ignore;
 
-import javax.inject.Inject;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class CategoryRepository_findByParentAndName_IntegTest extends ClassificationModuleIntegTest {
 
@@ -42,27 +47,34 @@ public class CategoryRepository_findByParentAndName_IntegTest extends Classifica
     @Inject
     ApplicationTenancyService applicationTenancyService;
 
-
     @Before
     public void setUpData() throws Exception {
-         fixtureScripts.runFixtureScript(new ClassifiedDemoObjectsFixture(), null);
+        fixtureScripts.runFixtureScript(new ClassifiedDemoObjectsFixture(), null);
     }
 
-
-    @Ignore
+    @Test
     public void happy_case() {
+        // given
+        Category parentLarge = categoryRepository.findByReference("LGE");
 
-        // for parent of "Sizes/Large", child of "Largest"
+        // when
+        Category childLarge = categoryRepository.findByParentAndName(parentLarge, "Larger");
 
+        // then
+        assertThat(childLarge.getReference()).isEqualTo("XL");
+        assertThat(childLarge.getParent()).isEqualTo(parentLarge);
     }
 
-    @Ignore
+    @Test
     public void when_none() {
+        // given
+        Taxonomy parentFrenchColours = (Taxonomy) categoryRepository.findByReference("FRCOL");
 
-        // for "French Colours", child of "Orange"
+        // when
+        Category childFrenchColours = categoryRepository.findByParentAndName(parentFrenchColours, "Nonexisting");
 
+        // then
+        assertThat(childFrenchColours).isNull();
     }
-
-
 
 }

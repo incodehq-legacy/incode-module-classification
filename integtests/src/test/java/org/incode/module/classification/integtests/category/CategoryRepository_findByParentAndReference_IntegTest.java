@@ -16,17 +16,21 @@
  */
 package org.incode.module.classification.integtests.category;
 
+import javax.inject.Inject;
+
+import org.junit.Before;
+import org.junit.Test;
+
 import org.incode.module.classification.dom.impl.applicability.ApplicabilityRepository;
+import org.incode.module.classification.dom.impl.category.Category;
 import org.incode.module.classification.dom.impl.category.CategoryRepository;
 import org.incode.module.classification.dom.impl.classification.ClassificationRepository;
 import org.incode.module.classification.dom.spi.ApplicationTenancyService;
 import org.incode.module.classification.fixture.dom.demo.first.DemoObjectMenu;
 import org.incode.module.classification.fixture.scripts.scenarios.ClassifiedDemoObjectsFixture;
 import org.incode.module.classification.integtests.ClassificationModuleIntegTest;
-import org.junit.Before;
-import org.junit.Ignore;
 
-import javax.inject.Inject;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class CategoryRepository_findByParentAndReference_IntegTest extends ClassificationModuleIntegTest {
 
@@ -42,26 +46,34 @@ public class CategoryRepository_findByParentAndReference_IntegTest extends Class
     @Inject
     ApplicationTenancyService applicationTenancyService;
 
-
     @Before
     public void setUpData() throws Exception {
         fixtureScripts.runFixtureScript(new ClassifiedDemoObjectsFixture(), null);
     }
 
-
-    @Ignore
+    @Test
     public void happy_case() {
+        // given
+        Category parentLarge = categoryRepository.findByReference("LGE");
 
-        // for parent of "Sizes/Large", child of "XXL"
+        // when
+        Category childLarge = categoryRepository.findByParentAndReference(parentLarge, "XL");
 
+        // then
+        assertThat(childLarge.getName()).isEqualTo("Larger");
+        assertThat(childLarge.getParent()).isEqualTo(parentLarge);
     }
 
-    @Ignore
+    @Test
     public void when_none() {
+        // given
+        Category parentLarge = categoryRepository.findByReference("LGE");
 
-        // for parent of "Sizes/Large", child of "XXXXL"
+        // when
+        Category childLarge = categoryRepository.findByParentAndReference(parentLarge, "XXXXL");
 
+        // then
+        assertThat(childLarge).isNull();
     }
-
 
 }

@@ -78,6 +78,7 @@ public class ClassifiedDemoObjectsFixture extends DiscoverableFixtureScript {
 
         // french taxonomy applicable only to French DemoObject (and not to OtherObject even if with FRA app tenancy)
         Taxonomy frenchColours = categoryRepository.createTaxonomy("French Colours");
+        frenchColours.setReference("FRCOL");
         Category frenchRed = frenchColours.addChild("Red", "FRRED", null);
         Category frenchWhite = frenchColours.addChild("White", "FRWHITE", null);
         Category frenchBlue = frenchColours.addChild("Blue", "FRBLUE", null);

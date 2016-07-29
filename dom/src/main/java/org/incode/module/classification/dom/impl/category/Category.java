@@ -305,8 +305,6 @@ public class Category implements Comparable<Category> {
         }
     }
 
-    //    public TranslatableString validateModifyName
-
     public void clearName() {
         modifyName(null);
     }
@@ -333,6 +331,11 @@ public class Category implements Comparable<Category> {
                 ? TranslatableString.tr("A category with reference '{reference}' already exists (under this parent)", "reference", reference)
                 : null;
     }
+
+    public void modifyReference(final String reference) {
+        setReference(reference);
+    }
+
     //endregion
 
     //region > fullyQualifiedName (derived property, persisted)

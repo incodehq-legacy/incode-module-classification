@@ -16,17 +16,23 @@
  */
 package org.incode.module.classification.integtests.category;
 
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.junit.Before;
+import org.junit.Test;
+
 import org.incode.module.classification.dom.impl.applicability.ApplicabilityRepository;
+import org.incode.module.classification.dom.impl.category.Category;
 import org.incode.module.classification.dom.impl.category.CategoryRepository;
 import org.incode.module.classification.dom.impl.classification.ClassificationRepository;
 import org.incode.module.classification.dom.spi.ApplicationTenancyService;
 import org.incode.module.classification.fixture.dom.demo.first.DemoObjectMenu;
 import org.incode.module.classification.fixture.scripts.scenarios.ClassifiedDemoObjectsFixture;
 import org.incode.module.classification.integtests.ClassificationModuleIntegTest;
-import org.junit.Before;
-import org.junit.Ignore;
 
-import javax.inject.Inject;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class CategoryRepository_findByParent_IntegTest extends ClassificationModuleIntegTest {
 
@@ -42,27 +48,36 @@ public class CategoryRepository_findByParent_IntegTest extends ClassificationMod
     @Inject
     ApplicationTenancyService applicationTenancyService;
 
-
     @Before
     public void setUpData() throws Exception {
-         fixtureScripts.runFixtureScript(new ClassifiedDemoObjectsFixture(), null);
+        fixtureScripts.runFixtureScript(new ClassifiedDemoObjectsFixture(), null);
     }
 
-
-    @Ignore
+    @Test
     public void happy_case() {
+        // given
+        Category large = categoryRepository.findByReference("LGE");
 
-        // for "Sizes/Large"
+        // when
+        List<Category> results = categoryRepository.findByParent(large);
 
+        // then
+        assertThat(results).hasSize(3);
+        assertThat(results).allMatch(c -> c.getParent().equals(large));
+        assertThat(results).extracting(Category::getReference)
+                .containsOnly("L", "XL", "XXL");
     }
 
-    @Ignore
+    @Test
     public void when_none() {
+        // given
+        Category frenchRed = categoryRepository.findByReference("FRRED");
 
-        // for "French Colours/Red"
+        // when
+        List<Category> results = categoryRepository.findByParent(frenchRed);
 
+        // then
+        assertThat(results).isEmpty();
     }
-
-
 
 }

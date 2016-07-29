@@ -53,9 +53,6 @@ public class Category_ordinal_IntegTest extends ClassificationModuleIntegTest {
 
     @Test
     public void happy_case() {
-        // eg given "Sizes/Medium", can change ordinal to 99.  The fully qualified name should be updated
-        // TODO: I'm assuming this was meant to be that the fully qualified ordinal should be updated
-
         // given
         Category medium = categoryRepository.findByReference("M");
         assertThat(medium.getFullyQualifiedOrdinal()).isEqualTo("1.2");
@@ -72,18 +69,14 @@ public class Category_ordinal_IntegTest extends ClassificationModuleIntegTest {
         // given
         Category large = categoryRepository.findByReference("LGE");
         assertThat(large.getFullyQualifiedOrdinal()).isEqualTo("1.1");
-        for (Category child : large.getChildren()) {
-            assertThat(child.getFullyQualifiedOrdinal().split("\\.")[1]).isEqualTo("1");
-        }
+        assertThat(large.getChildren()).allMatch(c -> c.getFullyQualifiedOrdinal().split("\\.")[1].equals("1"));
 
         // when
         large.modifyOrdinal(99);
 
         // then
         assertThat(large.getFullyQualifiedOrdinal()).isEqualTo("1.99");
-        for (Category child : large.getChildren()) {
-            assertThat(child.getFullyQualifiedOrdinal().split("\\.")[1]).isEqualTo("99");
-        }
+        assertThat(large.getChildren()).allMatch(c -> c.getFullyQualifiedOrdinal().split("\\.")[1].equals("99"));
     }
 
     @Test

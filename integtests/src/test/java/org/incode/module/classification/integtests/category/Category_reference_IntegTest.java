@@ -19,7 +19,6 @@ package org.incode.module.classification.integtests.category;
 import javax.inject.Inject;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -68,18 +67,14 @@ public class Category_reference_IntegTest extends ClassificationModuleIntegTest 
         Category smallest = categoryRepository.findByReference("XXS");
 
         // when
-        smallest.setReference("V.SMALL");
+        smallest.modifyReference("V.SMALL");
 
         // then
         assertThat(smallest.getReference()).isEqualTo("V.SMALL");
     }
 
-    @Ignore
+    @Test
     public void cannot_rename_to_a_reference_already_in_use() {
-        //TODO: Same as Category_name_IntegTest.cannot_rename_to_a_name_already_in_use():
-        //TODO: validateReference does not seem to actually validate a change of reference
-
-        // eg given "Sizes/Small/Smallest" ("XXS"), cannot rename reference to "XS".
         // given
         Category smallest = categoryRepository.findByReference("XXS");
 
@@ -88,7 +83,7 @@ public class Category_reference_IntegTest extends ClassificationModuleIntegTest 
         expectedException.expectMessage("A category with reference 'XS' already exists (under this parent)");
 
         // when
-        smallest.setReference("XS");
+        wrap(smallest).setReference("XS");
     }
 
     @Test

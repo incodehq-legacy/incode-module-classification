@@ -16,8 +16,6 @@
  */
 package org.incode.module.classification.integtests.category;
 
-import java.util.SortedSet;
-
 import javax.inject.Inject;
 
 import org.junit.Before;
@@ -68,29 +66,20 @@ public class Category_addChild_IntegTest extends ClassificationModuleIntegTest {
     @Test
     public void happy_case() {
         // given
-        assertThat(italianColours.getChildren().size()).isEqualTo(3);
+        assertThat(italianColours.getChildren()).hasSize(3);
 
         // when
         wrap(italianColours).addChild("Orange", "ORANGE", null);
 
         // then
-        assertThat(italianColours.getChildren().size()).isEqualTo(4);
+        assertThat(italianColours.getChildren()).hasSize(4);
     }
 
     @Test
     public void cannot_create_a_child_with_same_name_as_some_other_child() {
-        // For some reason, Java 8 lambda's do not result in found names of children
-        // Same goes for validation of addChild
-
         // given
-        SortedSet<Category> children = italianColours.getChildren();
-        boolean containsName = false;
-        for (Category child : children) {
-            if (child.getName().equals("Red")) {
-                containsName = true;
-            }
-        }
-        assertThat(containsName).isTrue();
+        assertThat(italianColours.getChildren()).extracting(Category::getName)
+                .contains("Red");
 
         // then
         expectedException.expect(InvalidException.class);
@@ -102,18 +91,9 @@ public class Category_addChild_IntegTest extends ClassificationModuleIntegTest {
 
     @Test
     public void cannot_create_a_child_with_same_reference_as_some_other_child() {
-        // For some reason, Java 8 lambda's do not result in found names of children
-        // Same goes for validation of addChild
-
         // given
-        SortedSet<Category> children = italianColours.getChildren();
-        boolean containsReference = false;
-        for (Category child : children) {
-            if (child.getReference().equals("GREEN")) {
-                containsReference = true;
-            }
-        }
-        assertThat(containsReference).isTrue();
+        assertThat(italianColours.getChildren()).extracting(Category::getReference)
+                .contains("GREEN");
 
         // then
         expectedException.expect(InvalidException.class);

@@ -19,7 +19,6 @@ package org.incode.module.classification.integtests.category;
 import javax.inject.Inject;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.isis.applib.services.wrapper.InvalidException;
@@ -75,25 +74,18 @@ public class Category_name_IntegTest extends ClassificationModuleIntegTest {
         // given
         Category large = categoryRepository.findByReference("LGE");
         assertThat(large.getFullyQualifiedName()).isEqualTo("Sizes/Large");
-        for (Category child : large.getChildren()) {
-            assertThat(child.getFullyQualifiedName().split("/")[1]).isEqualTo("Large");
-        }
+        assertThat(large.getChildren()).allMatch(c -> c.getFullyQualifiedName().split("/")[1].equals("Large"));
 
         // when
         large.modifyName("LRG");
 
         // then
         assertThat(large.getFullyQualifiedName()).isEqualTo("Sizes/LRG");
-        for (Category child : large.getChildren()) {
-            assertThat(child.getFullyQualifiedName().split("/")[1]).isEqualTo("LRG");
-        }
+        assertThat(large.getChildren()).allMatch(c -> c.getFullyQualifiedName().split("/")[1].equals("LRG"));
     }
 
-    @Ignore
+    @Test
     public void cannot_rename_to_a_name_already_in_use() {
-        // TODO: Expected is that validateName on Category would validate for modifyName, but doesn't seem to be the case. Is this correct behaviour?
-        // eg given "French Colours/Red", cannot rename to "French Colours/White"
-        
         // given
         Category red = categoryRepository.findByReference("FRRED");
 
@@ -102,8 +94,7 @@ public class Category_name_IntegTest extends ClassificationModuleIntegTest {
         expectedException.expectMessage("A category with name 'White' already exists (under this parent)");
 
         // when
-        red.modifyName("White");
-
+        wrap(red).setName("White");
     }
 
 }
