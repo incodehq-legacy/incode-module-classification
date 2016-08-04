@@ -16,17 +16,36 @@
  */
 package org.incode.module.classification.integtests.classification;
 
-import org.incode.module.classification.dom.impl.applicability.ApplicabilityRepository;
-import org.incode.module.classification.dom.impl.category.CategoryRepository;
-import org.incode.module.classification.dom.impl.classification.ClassificationRepository;
-import org.incode.module.classification.dom.spi.ApplicationTenancyService;
-import org.incode.module.classification.fixture.dom.demo.first.DemoObjectMenu;
-import org.incode.module.classification.fixture.scripts.scenarios.ClassifiedDemoObjectsFixture;
-import org.incode.module.classification.integtests.ClassificationModuleIntegTest;
-import org.junit.Before;
-import org.junit.Ignore;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import javax.inject.Inject;
+
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
+import org.apache.isis.applib.services.factory.FactoryService;
+
+import org.incode.module.classification.dom.impl.applicability.ApplicabilityRepository;
+import org.incode.module.classification.dom.impl.category.Category;
+import org.incode.module.classification.dom.impl.category.CategoryRepository;
+import org.incode.module.classification.dom.impl.category.taxonomy.Taxonomy;
+import org.incode.module.classification.dom.impl.classification.Classification;
+import org.incode.module.classification.dom.impl.classification.ClassificationRepository;
+import org.incode.module.classification.dom.spi.ApplicationTenancyService;
+import org.incode.module.classification.fixture.app.classification.demo.ClassificationForDemoObject;
+import org.incode.module.classification.fixture.app.classification.other.ClassificationForOtherObject;
+import org.incode.module.classification.fixture.dom.demo.first.DemoObject;
+import org.incode.module.classification.fixture.dom.demo.first.DemoObjectMenu;
+import org.incode.module.classification.fixture.dom.demo.other.OtherObject;
+import org.incode.module.classification.fixture.dom.demo.other.OtherObjectMenu;
+import org.incode.module.classification.fixture.scripts.scenarios.ClassifiedDemoObjectsFixture;
+import org.incode.module.classification.integtests.ClassificationModuleIntegTest;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class T_classify_IntegTest extends ClassificationModuleIntegTest {
 
@@ -40,48 +59,111 @@ public class T_classify_IntegTest extends ClassificationModuleIntegTest {
     @Inject
     DemoObjectMenu demoObjectMenu;
     @Inject
+    OtherObjectMenu otherObjectMenu;
+
+    @Inject
     ApplicationTenancyService applicationTenancyService;
+    @Inject
+    FactoryService factoryService;
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Before
     public void setUpData() throws Exception {
-         fixtureScripts.runFixtureScript(new ClassifiedDemoObjectsFixture(), null);
+        fixtureScripts.runFixtureScript(new ClassifiedDemoObjectsFixture(), null);
     }
 
-
-    @Ignore
+    @Test
     public void when_applicability_and_no_classification() {
+        // given
+        DemoObject demoBip = demoObjectMenu.listAll()
+                .stream()
+                .filter(demoObject -> demoObject.getName().equals("Demo bip (in Milan)"))
+                .findFirst()
+                .get();
+        assertThat(classificationRepository.findByClassified(demoBip)).isEmpty();
 
-        // given "Demo bip (in Milan)",
+        // when
+        final ClassificationForDemoObject._classify classification = factoryService.mixin(ClassificationForDemoObject._classify.class, demoBip);
+        Collection<Taxonomy> choices0Classify = classification.choices0Classify();
+        assertThat(choices0Classify)
+                .extracting(Taxonomy::getName)
+                .containsOnly("Italian Colours", "Sizes");
 
-        // can classify as both italian colour and as a size
+        List<String> categoryNames = new ArrayList<>();
 
+        for (Taxonomy taxonomy : choices0Classify) {
+            Category category = classification.default1Classify(taxonomy);
+            categoryNames.add(category.getName());
+            wrap(classification).classify(taxonomy, category);
+        }
+
+        // then
+        assertThat(classificationRepository.findByClassified(demoBip))
+                .extracting(Classification::getCategory)
+                .extracting(Category::getName)
+                .containsOnlyElementsOf(categoryNames);
     }
 
-    @Ignore
+    @Test
     public void cannot_classify_when_applicability_but_classifications_already_defined() {
+        // given
+        DemoObject demoFooInItaly = demoObjectMenu.listAll()
+                .stream()
+                .filter(demoObject -> demoObject.getName().equals("Demo foo (in Italy)"))
+                .findFirst()
+                .get();
+        assertThat(classificationRepository.findByClassified(demoFooInItaly))
+                .extracting(Classification::getCategory)
+                .extracting(Category::getName)
+                .contains("Red", "Medium");
 
-        // given "Demo foo (in Italy)", which already has classifications for italian colours and size
+        final ClassificationForDemoObject._classify classification = factoryService.mixin(ClassificationForDemoObject._classify.class, demoFooInItaly);
 
-        // cannot classify
+        // when
+        final String message = classification.disableClassify().toString();
 
+        // then
+        assertThat(message).isEqualTo("tr: There are no classifications that can be added");
     }
 
-    @Ignore
+    @Test
     public void cannot_classify_when_no_applicability_for_domain_type() {
+        // given
+        OtherObject otherBaz = otherObjectMenu.listAll()
+                .stream()
+                .filter(otherObject -> otherObject.getName().equals("Other baz (Global)"))
+                .findFirst()
+                .get();
+        assertThat(applicabilityRepository.findByDomainTypeAndUnderAtPath(otherBaz.getClass(), otherBaz.getAtPath())).isEmpty();
 
-        // given "Other baz (Global)", has no available applicabilities for "Size" (which only relates to 'Demo'
+        final ClassificationForOtherObject._classify classification = factoryService.mixin(ClassificationForOtherObject._classify.class, otherBaz);
 
-        // cannot classify
+        // when
+        final String message = classification.disableClassify().toString();
 
+        // then
+        assertThat(message).isEqualTo("tr: There are no classifications that can be added");
     }
 
-    @Ignore
+    @Test
     public void cannot_classify_when_no_applicability_for_atPath() {
+        // given
+        OtherObject otherBarInFrance = otherObjectMenu.listAll()
+                .stream()
+                .filter(otherObject -> otherObject.getName().equals("Other bar (in France)"))
+                .findFirst()
+                .get();
+        assertThat(applicabilityRepository.findByDomainTypeAndUnderAtPath(otherBarInFrance.getClass(), otherBarInFrance.getAtPath())).isEmpty();
 
-        // given "Other bar (in France)", has no available applicabilities for "Italian Colour" (which only relates to '/ITA' atPath)
+        final ClassificationForOtherObject._classify classification = factoryService.mixin(ClassificationForOtherObject._classify.class, otherBarInFrance);
 
-        // cannot classify
+        // when
+        final String message = classification.disableClassify().toString();
 
+        // then
+        assertThat(message).isEqualTo("tr: There are no classifications that can be added");
     }
 
 }

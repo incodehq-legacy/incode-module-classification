@@ -18,10 +18,25 @@
  */
 package org.incode.module.classification.dom.impl.classification;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.stream.Collectors;
+
+import javax.inject.Inject;
+
 import com.google.common.collect.Sets;
-import org.apache.isis.applib.annotation.*;
+
+import org.apache.isis.applib.annotation.Action;
+import org.apache.isis.applib.annotation.ActionLayout;
+import org.apache.isis.applib.annotation.Contributed;
+import org.apache.isis.applib.annotation.MemberOrder;
+import org.apache.isis.applib.annotation.SemanticsOf;
 import org.apache.isis.applib.services.i18n.TranslatableString;
 import org.apache.isis.applib.services.registry.ServiceRegistry;
+
 import org.incode.module.classification.dom.ClassificationModule;
 import org.incode.module.classification.dom.impl.applicability.Applicability;
 import org.incode.module.classification.dom.impl.applicability.ApplicabilityRepository;
@@ -30,15 +45,11 @@ import org.incode.module.classification.dom.impl.category.CategoryRepository;
 import org.incode.module.classification.dom.impl.category.taxonomy.Taxonomy;
 import org.incode.module.classification.dom.spi.ApplicationTenancyService;
 
-import javax.inject.Inject;
-import java.util.*;
-import java.util.Collection;
-import java.util.stream.Collectors;
-
 public abstract class T_classify<T> {
 
     //region > constructor
     private final T classified;
+
     public T_classify(final T classified) {
         this.classified = classified;
     }
@@ -49,8 +60,9 @@ public abstract class T_classify<T> {
 
     //endregion
 
-    //region > $$
-    public static class DomainEvent extends ClassificationModule.ActionDomainEvent<T_classify> { }
+    //region > classify
+    public static class DomainEvent extends ClassificationModule.ActionDomainEvent<T_classify> {
+    }
 
     @Action(
             domainEvent = DomainEvent.class,
@@ -61,44 +73,45 @@ public abstract class T_classify<T> {
             contributed = Contributed.AS_ACTION
     )
     @MemberOrder(name = "classifications", sequence = "1")
-    public T $$(
+    public T classify(
             final Taxonomy taxonomy,
             final Category category) {
         classificationRepository.create(category, classified);
         return classified;
     }
 
-    public TranslatableString disable$$() {
-        return choices0$$().isEmpty()? TranslatableString.tr("There are no classifications that can be added"): null;
+    public TranslatableString disableClassify() {
+        return choices0Classify().isEmpty() ? TranslatableString.tr("There are no classifications that can be added") : null;
     }
 
-    public Taxonomy default0$$() {
-        Collection<Taxonomy> taxonomies = choices0$$();
-        return taxonomies.size() == 1? taxonomies.iterator().next(): null;
+    public Taxonomy default0Classify() {
+        Collection<Taxonomy> taxonomies = choices0Classify();
+        return taxonomies.size() == 1 ? taxonomies.iterator().next() : null;
     }
 
-    public Collection<Taxonomy> choices0$$() {
+    public Collection<Taxonomy> choices0Classify() {
         SortedSet<Applicability> applicableToClassHierarchy = Sets.newTreeSet();
 
         // pull together all the 'Applicability's for this domain type and all its supertypes.
         String atPath = getAtPath();
-        if(atPath == null) {
+        if (atPath == null) {
             return Collections.emptyList();
         }
+        
         appendDirectApplicabilities(atPath, classified.getClass(), applicableToClassHierarchy);
-
 
         // the obtain the corresponding 'Taxonomy's of each of these
         Set<Taxonomy> taxonomies = Sets.newTreeSet();
         taxonomies.addAll(
-            applicableToClassHierarchy.stream()
-                    .map(Applicability::getTaxonomy)
-                    .distinct()
-                    .collect(Collectors.toSet())
-            );
+                applicableToClassHierarchy.stream()
+                        .map(Applicability::getTaxonomy)
+                        .distinct()
+                        .collect(Collectors.toSet())
+        );
 
         // remove any taxonomies already selected
-        T_classifications t_classifications = new T_classifications(classified) {};
+        T_classifications t_classifications = new T_classifications(classified) {
+        };
         serviceRegistry.injectServicesInto(t_classifications);
         final List<Classification> classifications = t_classifications.$$();
         final Set<Taxonomy> existing = classifications.stream().map(Classification::getTaxonomy).collect(Collectors.toSet());
@@ -106,7 +119,6 @@ public abstract class T_classify<T> {
 
         return taxonomies;
     }
-
 
     String getAtPath() {
         return applicationTenancyRepositories.stream()
@@ -120,7 +132,7 @@ public abstract class T_classify<T> {
             final String atPath,
             Class<?> domainType,
             final SortedSet<Applicability> applicabilities) {
-        while(domainType != null) {
+        while (domainType != null) {
             appendDirectApplicatiesFor(atPath, domainType, applicabilities);
             domainType = domainType.getSuperclass();
         }
@@ -136,12 +148,12 @@ public abstract class T_classify<T> {
         applicabilities.addAll(applicabilitiesForDomainType);
     }
 
-    public Category default1$$(final Taxonomy taxonomy) {
-        Collection<Category> categories = choices1$$(taxonomy);
-        return categories.size() == 1? categories.iterator().next(): null;
+    public Category default1Classify(final Taxonomy taxonomy) {
+        Collection<Category> categories = choices1Classify(taxonomy);
+        return categories.size() > 0 ? categories.iterator().next() : null;
     }
 
-    public Collection<Category> choices1$$(final Taxonomy taxonomy) {
+    public Collection<Category> choices1Classify(final Taxonomy taxonomy) {
         final List<Category> categories = categoryRepository.findByTaxonomy(taxonomy);
         return categories.stream()
                 .filter(x -> x.getParent() != null) // exclude top-level taxonomy

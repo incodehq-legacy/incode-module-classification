@@ -19,10 +19,10 @@ package org.incode.module.classification.integtests.category;
 import javax.inject.Inject;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.isis.applib.services.wrapper.InvalidException;
+import org.apache.isis.applib.services.xactn.TransactionService;
 
 import org.incode.module.classification.dom.impl.applicability.ApplicabilityRepository;
 import org.incode.module.classification.dom.impl.category.Category;
@@ -49,16 +49,16 @@ public class Category_removeChild_IntegTest extends ClassificationModuleIntegTes
     @Inject
     ApplicationTenancyService applicationTenancyService;
 
+    @Inject
+    TransactionService transactionService;
+
     @Before
     public void setUpData() throws Exception {
         fixtureScripts.runFixtureScript(new ClassifiedDemoObjectsFixture(), null);
     }
 
-    @Ignore("EST-771")
+    @Test
     public void happy_case() {
-        // TODO: removeChild does not seem to actually remove the child from the parent
-
-        // eg given "Sizes/Large", can remove "Largest" child
         // given
         Category large = categoryRepository.findByReference("LGE");
         Category largest = categoryRepository.findByReference("XXL");
@@ -66,12 +66,13 @@ public class Category_removeChild_IntegTest extends ClassificationModuleIntegTes
 
         // when
         wrap(large).removeChild(largest);
+        transactionService.nextTransaction();
 
         // then
         assertThat(large.getChildren()).doesNotContain(largest);
     }
 
-    @Ignore("EST-771")
+    @Test
     public void happy_case_cascading() {
         // TODO: same issue
 
@@ -84,10 +85,11 @@ public class Category_removeChild_IntegTest extends ClassificationModuleIntegTes
 
         // when
         wrap(sizes).removeChild(large);
+        transactionService.nextTransaction();
 
         // then
         assertThat(sizes.getChildren()).doesNotContain(large);
-        assertThat(large.getChildren()).isEmpty();
+        assertThat(categoryRepository.findByReference("LGE")).isNull();
     }
 
     @Test

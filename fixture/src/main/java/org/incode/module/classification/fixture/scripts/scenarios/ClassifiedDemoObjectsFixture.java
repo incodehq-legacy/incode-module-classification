@@ -16,8 +16,15 @@
  */
 package org.incode.module.classification.fixture.scripts.scenarios;
 
+import java.util.List;
+
+import javax.inject.Inject;
+
 import com.google.common.collect.Lists;
+
 import org.apache.isis.applib.fixturescripts.DiscoverableFixtureScript;
+import org.apache.isis.applib.services.factory.FactoryService;
+
 import org.incode.module.classification.dom.impl.category.Category;
 import org.incode.module.classification.dom.impl.category.CategoryRepository;
 import org.incode.module.classification.dom.impl.category.taxonomy.Taxonomy;
@@ -29,10 +36,7 @@ import org.incode.module.classification.fixture.dom.demo.other.OtherObject;
 import org.incode.module.classification.fixture.dom.demo.other.OtherObjectMenu;
 import org.incode.module.classification.fixture.scripts.teardown.ClassificationDemoAppTearDownFixture;
 
-import java.util.List;
-
 public class ClassifiedDemoObjectsFixture extends DiscoverableFixtureScript {
-
 
     //region > constructor
     public ClassifiedDemoObjectsFixture() {
@@ -48,6 +52,7 @@ public class ClassifiedDemoObjectsFixture extends DiscoverableFixtureScript {
 
     //region > demoObjects (output)
     private List<DemoObject> demoObjects = Lists.newArrayList();
+
     public List<DemoObject> getDemoObjects() {
         return demoObjects;
     }
@@ -55,6 +60,7 @@ public class ClassifiedDemoObjectsFixture extends DiscoverableFixtureScript {
 
     //region > otherObjects (output)
     private List<OtherObject> otherObjects = Lists.newArrayList();
+
     public List<OtherObject> getOtherObjects() {
         return otherObjects;
     }
@@ -62,7 +68,6 @@ public class ClassifiedDemoObjectsFixture extends DiscoverableFixtureScript {
 
     @Override
     protected void execute(final ExecutionContext executionContext) {
-
         // prereqs
         executionContext.executeChild(this, new ClassificationDemoAppTearDownFixture());
 
@@ -102,7 +107,6 @@ public class ClassifiedDemoObjectsFixture extends DiscoverableFixtureScript {
 
         wrap(globalSizes).applicable("/", DemoObject.class.getName());
 
-
         // create a sample set of DemoObject and OtherObject, for various app tenancies
 
         final DemoObject demoFooInItaly = createDemo("Demo foo (in Italy)", "/ITA", executionContext);
@@ -118,12 +122,16 @@ public class ClassifiedDemoObjectsFixture extends DiscoverableFixtureScript {
         final OtherObject otherBip = createOther("Other bip (in Milan)", "/ITA/I-MIL", executionContext);
         final OtherObject otherBop = createOther("Other bop (in Paris)", "/FRA/F-PAR", executionContext);
 
-
         // classify DemoObject
-        wrap(classify(demoFooInItaly)).$$(italianColours, italianRed);
-        wrap(classify(demoFooInItaly)).$$(globalSizes, medium);
-        wrap(classify(demoBarInFrance)).$$(globalSizes, smallSmaller);
 
+        final ClassificationForDemoObject._classify mixinFrance = factoryService.mixin(ClassificationForDemoObject._classify.class, demoBarInFrance);
+        final ClassificationForDemoObject._classify mixin = factoryService.mixin(ClassificationForDemoObject._classify.class, demoFooInItaly);
+        final ClassificationForDemoObject._classify mixin1 = factoryService.mixin(ClassificationForDemoObject._classify.class, demoFooInItaly);
+        wrap(mixin).classify(italianColours, italianRed);
+
+        wrap(mixin1).classify(globalSizes, medium);
+
+        wrap(mixinFrance).classify(globalSizes, smallSmaller);
 
         // leave OtherObject unclassified
 
@@ -156,5 +164,7 @@ public class ClassifiedDemoObjectsFixture extends DiscoverableFixtureScript {
     CategoryRepository categoryRepository;
     //endregion
 
+    @Inject
+    FactoryService factoryService;
 
 }

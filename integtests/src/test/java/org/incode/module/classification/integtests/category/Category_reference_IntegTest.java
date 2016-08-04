@@ -60,9 +60,6 @@ public class Category_reference_IntegTest extends ClassificationModuleIntegTest 
 
     @Test
     public void happy_case() {
-        // TODO: Should the reference be modified through setter, or should a modifyReference method be implemented?
-        // eg given "Sizes/Small/Smallest" ("XXS"), can rename reference to "V.SMALL".
-
         // given
         Category smallest = categoryRepository.findByReference("XXS");
 
@@ -88,7 +85,6 @@ public class Category_reference_IntegTest extends ClassificationModuleIntegTest 
 
     @Test
     public void can_clear() {
-        // eg given "Sizes/Small/Smallest" ("XXS"), can set reference to null
         // given
         Category smallest = categoryRepository.findByReference("XXS");
 

@@ -18,15 +18,15 @@
  */
 package org.incode.module.classification.dom.impl.applicability;
 
+import java.util.List;
+
+import javax.inject.Inject;
+
 import org.apache.isis.applib.annotation.DomainService;
 import org.apache.isis.applib.annotation.NatureOfService;
 import org.apache.isis.applib.annotation.Programmatic;
 import org.apache.isis.applib.query.QueryDefault;
 import org.apache.isis.applib.services.repository.RepositoryService;
-
-import javax.inject.Inject;
-import java.util.List;
-
 
 @DomainService(
         nature = NatureOfService.DOMAIN,
@@ -44,7 +44,6 @@ public class ApplicabilityRepository {
                         "atPath", atPath));
     }
     //endregion
-
 
     //region > injected
     @Inject

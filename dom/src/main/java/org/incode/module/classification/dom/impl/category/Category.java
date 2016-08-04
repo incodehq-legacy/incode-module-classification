@@ -177,7 +177,7 @@ public class Category implements Comparable<Category> {
     }
     //endregion
 
-    //region > constructor
+    //region > constructorle
     protected Category(
             final Category parent,
             final String name,

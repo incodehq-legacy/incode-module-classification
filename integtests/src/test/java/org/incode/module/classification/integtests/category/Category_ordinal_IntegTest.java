@@ -81,9 +81,6 @@ public class Category_ordinal_IntegTest extends ClassificationModuleIntegTest {
 
     @Test
     public void can_clear() {
-        // TODO: Should the ordinal be set to '1.3.0' as asserted below, or set to '0'?
-        // eg given "Sizes/Small/Smallest" ("XXS"), can set ordinal to null.  It should be set to 0.
-
         // given
         Category smallest = categoryRepository.findByReference("XXS");
         assertThat(smallest.getFullyQualifiedOrdinal()).isEqualTo("1.3.3");

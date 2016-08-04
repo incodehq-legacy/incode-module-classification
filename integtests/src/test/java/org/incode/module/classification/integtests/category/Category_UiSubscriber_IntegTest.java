@@ -16,17 +16,23 @@
  */
 package org.incode.module.classification.integtests.category;
 
+import javax.inject.Inject;
+
+import org.junit.Before;
+import org.junit.Ignore;
+
+import org.apache.isis.applib.services.title.TitleService;
+
 import org.incode.module.classification.dom.impl.applicability.ApplicabilityRepository;
+import org.incode.module.classification.dom.impl.category.Category;
 import org.incode.module.classification.dom.impl.category.CategoryRepository;
 import org.incode.module.classification.dom.impl.classification.ClassificationRepository;
 import org.incode.module.classification.dom.spi.ApplicationTenancyService;
 import org.incode.module.classification.fixture.dom.demo.first.DemoObjectMenu;
 import org.incode.module.classification.fixture.scripts.scenarios.ClassifiedDemoObjectsFixture;
 import org.incode.module.classification.integtests.ClassificationModuleIntegTest;
-import org.junit.Before;
-import org.junit.Ignore;
 
-import javax.inject.Inject;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class Category_UiSubscriber_IntegTest extends ClassificationModuleIntegTest {
 
@@ -42,38 +48,25 @@ public class Category_UiSubscriber_IntegTest extends ClassificationModuleIntegTe
     @Inject
     ApplicationTenancyService applicationTenancyService;
 
+    @Inject
+    TitleService titleService;
+
+    Category category;
+
     @Before
     public void setUpData() throws Exception {
         fixtureScripts.runFixtureScript(new ClassifiedDemoObjectsFixture(), null);
+        category = categoryRepository.createChild(null, "Jeroen", "KOEKENBAKKER", 1);
     }
-
 
     @Ignore
     public void override_title_subscriber() {
-
-        // given a service subscribing on Category.TitleUiEvent
-
-        // then the title of an category should be...
-
+        assertThat(titleService.titleOf(category)).isEqualTo("Holtkamp");
     }
 
     @Ignore
     public void override_icon_subscriber() {
-
-        // given a service subscribing on Category.IconUiEvent
-
-        // then the icon of an category should be...
-
+        assertThat(titleService.iconNameOf(category)).isEqualTo("Jodekoek.png");
     }
-
-    @Ignore
-    public void override_cssClass_subscriber() {
-
-        // given a service subscribing on Category.CssClassUiEvent
-
-        // then the CSS class of an category should be...
-
-    }
-
 
 }
