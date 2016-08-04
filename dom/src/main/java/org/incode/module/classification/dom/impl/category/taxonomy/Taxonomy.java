@@ -2,17 +2,21 @@ package org.incode.module.classification.dom.impl.category.taxonomy;
 
 import lombok.Getter;
 import lombok.Setter;
+
 import org.apache.isis.applib.annotation.*;
 import org.apache.isis.applib.annotation.Collection;
 import org.apache.isis.applib.services.i18n.TranslatableString;
+
 import org.incode.module.classification.dom.impl.applicability.Applicability;
 import org.incode.module.classification.dom.impl.category.Category;
 import org.incode.module.classification.dom.impl.category.CategoryRepository;
 
 import javax.inject.Inject;
 import javax.jdo.annotations.InheritanceStrategy;
+
 import java.util.*;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 @javax.jdo.annotations.PersistenceCapable
 @javax.jdo.annotations.Inheritance(strategy = InheritanceStrategy.SUPERCLASS_TABLE)
@@ -27,9 +31,10 @@ public class Taxonomy extends Category {
     }
     //endregion
 
-
     //region > applicabilties (collection)
-    public static class ApplicabilitiesDomainEvent extends CollectionDomainEvent<Applicability> { }
+    public static class ApplicabilitiesDomainEvent extends CollectionDomainEvent<Applicability> {
+    }
+
     @javax.jdo.annotations.Persistent(mappedBy = "taxonomy", dependentElement = "true")
     @Collection(
             domainEvent = ApplicabilitiesDomainEvent.class,
@@ -41,7 +46,9 @@ public class Taxonomy extends Category {
     //endregion
 
     //region > applicable (action)
-    public static class ApplicableToDomainEvent extends ActionDomainEvent { }
+    public static class ApplicableToDomainEvent extends ActionDomainEvent {
+    }
+
     @Action(
             domainEvent = ApplicableToDomainEvent.class
     )
@@ -58,23 +65,36 @@ public class Taxonomy extends Category {
         repositoryService.persistAndFlush(applicability);
         return this;
     }
+
     public TranslatableString validateApplicable(final String atPath, final String domainTypeName) {
-        final Optional<Applicability> any =
-                getAppliesTo().stream()
-                        .filter(x -> Objects.equals(x.getAtPath(), atPath) &&
-                                Objects.equals(x.getDomainType(), domainTypeName))
-                        .findAny();
-        return any.isPresent()
-                ? TranslatableString.tr(
-                        "Already applicable for '{atPath}' and '{domainTypeName}'",
-                        "atPath", atPath,
-                        "domainTypeName", domainTypeName)
-                : null;
+
+        return isApplicable(atPath, domainTypeName) ? null :
+                TranslatableString.tr(
+                                "Already applicable for '{atPath}' and '{domainTypeName}'",
+                                "atPath", atPath,
+                                "domainTypeName", domainTypeName);
+    }
+
+    private boolean isApplicable(final String atPath, final String domainTypeName) {
+        SortedSet<Applicability> applicabilities = getAppliesTo();
+        for (Applicability applicability : applicabilities) {
+            if (applicability.getAtPath().equals(atPath) && applicability.getDomainType().equals(domainTypeName)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean isApplicable_does_not_work(final String atPath, final String domainTypeName) {
+        //TODO: We are staring like a rabbit (or deer) in the headlights but have no clue why this doesn't work... Beer anyone?
+        return getAppliesTo().stream().noneMatch(applicability -> applicability.getAtPath().equals(atPath) && applicability.getDomainType().equals(domainTypeName));
     }
     //endregion
 
     //region > notApplicable (action)
-    public static class NotApplicableDomainEvent extends ActionDomainEvent { }
+    public static class NotApplicableDomainEvent extends ActionDomainEvent {
+    }
+
     @Action(
             domainEvent = NotApplicableDomainEvent.class,
             semantics = SemanticsOf.IDEMPOTENT_ARE_YOU_SURE
@@ -89,7 +109,7 @@ public class Taxonomy extends Category {
     }
 
     public TranslatableString disableNotApplicable() {
-        return choices0NotApplicable().isEmpty()? TranslatableString.tr("No applicabilities to remove"): null;
+        return choices0NotApplicable().isEmpty() ? TranslatableString.tr("No applicabilities to remove") : null;
     }
 
     public SortedSet<Applicability> choices0NotApplicable() {
