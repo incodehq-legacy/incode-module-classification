@@ -16,17 +16,30 @@
  */
 package org.incode.module.classification.integtests.classification;
 
-import org.incode.module.classification.dom.impl.applicability.ApplicabilityRepository;
-import org.incode.module.classification.dom.impl.category.CategoryRepository;
-import org.incode.module.classification.dom.impl.classification.ClassificationRepository;
-import org.incode.module.classification.dom.spi.ApplicationTenancyService;
-import org.incode.module.classification.fixture.dom.demo.first.DemoObjectMenu;
-import org.incode.module.classification.fixture.scripts.scenarios.ClassifiedDemoObjectsFixture;
-import org.incode.module.classification.integtests.ClassificationModuleIntegTest;
-import org.junit.Before;
-import org.junit.Ignore;
+import java.util.List;
 
 import javax.inject.Inject;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import org.apache.isis.applib.services.factory.FactoryService;
+
+import org.incode.module.classification.dom.impl.applicability.ApplicabilityRepository;
+import org.incode.module.classification.dom.impl.category.CategoryRepository;
+import org.incode.module.classification.dom.impl.classification.Classification;
+import org.incode.module.classification.dom.impl.classification.ClassificationRepository;
+import org.incode.module.classification.dom.spi.ApplicationTenancyService;
+import org.incode.module.classification.fixture.app.classification.demo.ClassificationForDemoObject;
+import org.incode.module.classification.fixture.app.classification.other.ClassificationForOtherObject;
+import org.incode.module.classification.fixture.dom.demo.first.DemoObject;
+import org.incode.module.classification.fixture.dom.demo.first.DemoObjectMenu;
+import org.incode.module.classification.fixture.dom.demo.other.OtherObject;
+import org.incode.module.classification.fixture.dom.demo.other.OtherObjectMenu;
+import org.incode.module.classification.fixture.scripts.scenarios.ClassifiedDemoObjectsFixture;
+import org.incode.module.classification.integtests.ClassificationModuleIntegTest;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class T_unclassify_IntegTest extends ClassificationModuleIntegTest {
 
@@ -40,30 +53,56 @@ public class T_unclassify_IntegTest extends ClassificationModuleIntegTest {
     @Inject
     DemoObjectMenu demoObjectMenu;
     @Inject
+    OtherObjectMenu otherObjectMenu;
+
+    @Inject
     ApplicationTenancyService applicationTenancyService;
+    @Inject
+    FactoryService factoryService;
 
     @Before
     public void setUpData() throws Exception {
-         fixtureScripts.runFixtureScript(new ClassifiedDemoObjectsFixture(), null);
+        fixtureScripts.runFixtureScript(new ClassifiedDemoObjectsFixture(), null);
     }
 
-    @Ignore
+    @Test
     public void enabled_when_classifications_exist() {
+        // given
+        DemoObject demoFooInItaly = demoObjectMenu.listAll()
+                .stream()
+                .filter(demoObject -> demoObject.getName().equals("Demo foo (in Italy)"))
+                .findFirst()
+                .get();
+        final List<Classification> byClassified = classificationRepository.findByClassified(demoFooInItaly);
+        assertThat(byClassified).hasSize(2);
 
-        // given "Demo bar (in Milan)", that has two classifications
+        // when
+        final ClassificationForDemoObject._unclassify unclassify = factoryService.mixin(ClassificationForDemoObject._unclassify.class, demoFooInItaly);
+        wrap(unclassify).unclassify(byClassified.get(0));
 
-        // can unclassify one of them.
-
+        // then
+        assertThat(classificationRepository.findByClassified(demoFooInItaly)).hasSize(1);
     }
 
-    @Ignore
+    @Test
     public void disabled_when_no_classification_to_remove() {
 
         // given "Other bar (in Paris)", that has no classifications
+        // given
+        OtherObject otherBarInFrance = otherObjectMenu.listAll()
+                .stream()
+                .filter(otherObject -> otherObject.getName().equals("Other bar (in France)"))
+                .findFirst()
+                .get();
+        assertThat(classificationRepository.findByClassified(otherBarInFrance)).isEmpty();
 
-        // the action should be disabled
+        final ClassificationForOtherObject._unclassify unclassify = factoryService.mixin(ClassificationForOtherObject._unclassify.class, otherBarInFrance);
 
+        // when
+        final String message = unclassify.disableUnclassify().toString();
+
+        // then
+        assertThat(message).isEqualTo("tr: No classifications to delete");
     }
-
 
 }
