@@ -1,6 +1,9 @@
 package org.incode.module.classification.dom.impl.category;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -412,26 +415,13 @@ public class Category implements Comparable<Category> {
     }
 
     public TranslatableString validate0AddChild(final String name) {
-        // Java8 lambda's do not seem to work on the name, for some reason.
-        // No matches are found using lambda's, whereas a normal iteration does.
-
-        //        final Optional<Category> any =
-        //                getChildren().stream().filter(x -> Objects.equals(x.getName(), name)).findAny();
-        //        return any.isPresent()
-        //                ? TranslatableString.tr(
-        //                        "There is already a child classification with the name of '{name}'",
-        //                        "name", name)
-        //                : null;
-        final SortedSet<Category> children = getChildren();
-        for (Category child : children) {
-            if (child.getName().equals(name)) {
-                return TranslatableString.tr(
-                        "There is already a child classification with the name of '{name}'",
-                        "name", name);
-            }
-        }
-
-        return null;
+        final Optional<Category> any =
+                new ArrayList<>(getChildren()).stream().filter(x -> Objects.equals(x.getName(), name)).findAny();
+        return any.isPresent()
+                ? TranslatableString.tr(
+                "There is already a child classification with the name of '{name}'",
+                "name", name)
+                : null;
     }
 
     public TranslatableString validate1AddChild(final String reference) {
@@ -439,27 +429,13 @@ public class Category implements Comparable<Category> {
             return null;
         }
 
-        // Java8 lambda's do not seem to work on the name, for some reason.
-        // No matches are found using lambda's, whereas a normal iteration does.
-
-        //        final Optional<Category> any =
-        //                getChildren().stream().filter(x -> Objects.equals(x.getReference(), reference)).findAny();
-        //        return any.isPresent()
-        //                ? TranslatableString.tr(
-        //                "There is already a child classification with the reference of '{reference}'",
-        //                "reference", reference)
-        //                : null;
-
-        final SortedSet<Category> children = getChildren();
-        for (Category child : children) {
-            if (child.getReference().equals(reference)) {
-                return TranslatableString.tr(
-                        "There is already a child classification with the reference of '{reference}'",
-                        "reference", reference);
-            }
-        }
-
-        return null;
+        final Optional<Category> any =
+                new ArrayList<>(getChildren()).stream().filter(x -> Objects.equals(x.getReference(), reference)).findAny();
+        return any.isPresent()
+                ? TranslatableString.tr(
+                "There is already a child classification with the reference of '{reference}'",
+                "reference", reference)
+                : null;
     }
     // endregion
 
@@ -481,10 +457,6 @@ public class Category implements Comparable<Category> {
     }
 
     public TranslatableString validateRemoveChild(final Category category) {
-        //        List<Classification> classifications = classificationRepository.findByCategory(category);
-        //        return classifications.isEmpty() ? null : TranslatableString.tr("This child is classified by '{object}' and cannot be removed",
-        //                "object", classifications.get(0).getClassified().toString());
-
         return categoryRepository.validateRemoveCascade(category);
     }
 
