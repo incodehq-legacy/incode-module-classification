@@ -13,21 +13,23 @@ object's type and also its application tenancy (eg country within a multi-tenanc
 
 There are _no_ requirements for those domain objects implement any interfaces.  A subclass of the `Classification`
 abstract class is required; this acts as the "glue" between the `Category` and the "classified" domain object.  In
-total about link:https://github.com/incodehq/incode-module-classification/blob/master/fixture/src/main/java/org/incode/module/classification/fixture/app/classification/demo/ClassificationForDemoObject.java[50 lines of boilerplate] are required, details below.
+total about
+link:https://github.com/incodehq/incode-module-classification/blob/master/fixture/src/main/java/org/incode/module/classification/fixture/app/classification/demo/ClassificationForDemoObject.java[50 lines of boilerplate]
+are required, details below.
 
 This module expects that application tenancy path is hierarchical (so for example "/ITA/MIL" resides within both "/ITA"
 and "/").  This allows ``Taxonomy``s to be declared as applicable at one level (eg "/ITA") and to be considered
-applicable for domain objects at that leve and sub-levels (eg "/ITA/MIL").  The value of available the application
+applicable for domain objects at that level and sub-levels (eg "/ITA/MIL").  The value of the application
 tenancy path of a domain object is provided through the `ApplicationTenancyService` SPI.
 
 
 == Domain Model
 
-The following `yuml.me` class diagram highlights the main concepts:
+The following http://yuml.me[] class diagram highlights the main concepts:
 
-image::http://yuml.me/2a277faf[link="http://yuml.me/2a277faf"]
+image::http://yuml.me/9a695ae7[link="http://yuml.me/9a695ae7"]
 
-(The colours used in the diagram are - approximately - from link:https://en.wikipedia.org/wiki/Object_Modeling_in_Color[Object Modeling in Color].
+(The colours used in the diagram are - approximately - from link:https://en.wikipedia.org/wiki/Object_Modeling_in_Color[Object Modeling in Color]).
 
 
 === `Taxonomy` and `Category`
@@ -53,15 +55,15 @@ However, deeper ``Taxonomy``s are possible, eg:
 *** "Sizes/Large/Larger"
 *** "Sizes/Large/Largest"
 
-There can be many such taxonomies; any given domain object can only have one `Classification` per `Taxonomy`.
-hierarchy (but not more than one classification per hierarchy).  Thus, a domain object might be classified as both
-`Italian Colours/Red` and `Sizes/Medium`, but it isn't possible to classify as both `Italian Colours/Red` and
-`Italian Colours/Green`.
+There can be many such taxonomies; any given domain object can only have one `Classification` per `Taxonomy` hierarchy
+(but not more than one classification per hierarchy).  Thus, a domain object might be classified as both
+"Italian Colours/Red" and "Sizes/Medium", but it isn't possible to classify as both "Italian Colours/Red" and
+"Italian Colours/Green".
 
 === `Applicability` and `ApplicationTenancyService`
 
-Not every domain object can be classified with respect to every ``Taxonomy``.  Instead, the available set is restricted by
-the `Applicability` entity.  This identifies which ``Taxonomy``(s) can be associated with domain object types.
+Not every domain object can be classified with respect to every ``Taxonomy``.  Instead, the available set is restricted
+by the `Applicability` entity.  This identifies which ``Taxonomy``(s) can be associated with domain object types.
 This is further qualified by the application tenancy of the domain object (for multi-tenanted applications).
 
 The `ApplicationTenancyService` SPI service is used to obtain the application tenancy of each domain object.
@@ -69,7 +71,9 @@ The `ApplicationTenancyService` SPI service is used to obtain the application te
 === `Classification`
 
 The `Classification` is the tuple that associates a particular domain object with a particular `Category` in some
-`Taxonomy`.  This must be with respect to some `Applicability`.
+`Taxonomy`.  This must be with respect to some `Applicability`.  `Classification` itself is an `abstract` class; for
+each domain object to be classified, a subclass of `Classification` is required, providing a type-safe (referential
+integrity) connection between the two entities.
 
 [NOTE]
 ====
@@ -115,16 +119,16 @@ which returns the three demo taxonomies, "Size", "Italian Colours" and "French C
 image::https://raw.githubusercontent.com/incodehq/incode-module-classification/master/images/040-view-taxonomy.png[link="https://raw.githubusercontent.com/incodehq/incode-module-classification/master/images/040-view-taxonomy.png"]
 
 
-The "French Colours" `Taxonomy` contains three `Category`s, namely "Red", "White" and "Blue":
+The "French Colours" ``Taxonomy`` contains three ``Category``s, namely "Red", "White" and "Blue":
 
 image::https://raw.githubusercontent.com/incodehq/incode-module-classification/master/images/050-french-colour-taxonomy.png[link="https://raw.githubusercontent.com/incodehq/incode-module-classification/master/images/050-french-colour-taxonomy.png"]
 
-while the "Italian Colours" `Taxonomy` contains three different `Category`s, "Red", "White" and "Green":
+while the "Italian Colours" ``Taxonomy`` contains three different ``Category``s, "Red", "White" and "Green":
 
 image::https://raw.githubusercontent.com/incodehq/incode-module-classification/master/images/060-italian-colour-taxonomy.png[link="https://raw.githubusercontent.com/incodehq/incode-module-classification/master/images/060-italian-colour-taxonomy.png"]
 
 Note that the "French Colours"' "Red" is different from the "Italian Colours"' "Red", also for "White".  These are two
-different `Category`s in two different `Taxonomy`s that just happen to have the same (local) name.
+different ``Category``s in two different ``Taxonomy``s that just happen to have the same (local) name.
 
 Also note (as can be guessed from their names) that the "French Colours" `Taxonomy` only applies to the "/FRA" app
 tenancy, while the "Italian Colours" `Taxonomy` applies only to the "/ITA" app tenancy.  The former also only to the
@@ -135,8 +139,8 @@ The final `Taxonomy` is "Size":
 
 image::https://raw.githubusercontent.com/incodehq/incode-module-classification/master/images/070-size-taxonomy.png[link="https://raw.githubusercontent.com/incodehq/incode-module-classification/master/images/070-size-taxonomy.png"]
 
-In contrast to the two "colour" taxonomies, the "Size" taxonomy is defined globally (for the "/" app tenancy).  It does
-only apply to the `DemoObject` domain type, not to the `OtherObject` domain type.
+In contrast to the two "colour" taxonomies, the "Size" taxonomy is defined globally (for the "/" app tenancy).  However,
+it only applies to the ``DemoObject`` domain type, not to the ``OtherObject`` domain type.
 
 The "Size" taxonomy is also more complex than the other two taxonomies, in that contains categories and sub-categories:
 
@@ -253,7 +257,7 @@ Like `DemoObject`, there are five instances of `OtherObject`, again each with a 
 image::https://raw.githubusercontent.com/incodehq/incode-module-classification/master/images/150-view-other-foo.png[link="https://raw.githubusercontent.com/incodehq/incode-module-classification/master/images/150-view-other-foo.png"]
 
 The difference between `OtherObject` and `DemoObject` is that neither the "Sizes" nor "French Colours" taxonomies are
-applicable to `OtherObject.  Thus, with the "foo" `OtherObject` the only available taxonomy to classify is "Italian Colours":
+applicable to ``OtherObject``.  Thus, with the "foo" ``OtherObject`` the only available taxonomy to classify is "Italian Colours":
 
 image::https://raw.githubusercontent.com/incodehq/incode-module-classification/master/images/160-other-cannot-classify-size.png[link="https://raw.githubusercontent.com/incodehq/incode-module-classification/master/images/160-other-cannot-classify-size.png"]
 
@@ -266,7 +270,7 @@ Here the `Classification` is being changed:
 image::https://raw.githubusercontent.com/incodehq/incode-module-classification/master/images/180-change-classification-category-prompt.png[link="https://raw.githubusercontent.com/incodehq/incode-module-classification/master/images/180-change-classification-category-prompt.png"]
 
 
-And then has been changed:
+Which we can see _has_ then been changed:
 
 image::https://raw.githubusercontent.com/incodehq/incode-module-classification/master/images/190-change-classification-category.png[link="https://raw.githubusercontent.com/incodehq/incode-module-classification/master/images/190-change-classification-category.png"]
 

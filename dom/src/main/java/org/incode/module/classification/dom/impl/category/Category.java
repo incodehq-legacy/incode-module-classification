@@ -341,7 +341,7 @@ public class Category implements Comparable<Category> {
 
     //endregion
 
-    //region > fullyQualifiedName (derived property, persisted)
+    //region > fullyQualifiedOrdinal (derived property, persisted)
     public static class FullyQualifiedOrdinalDomainEvent extends PropertyDomainEvent<String> {
     }
 
