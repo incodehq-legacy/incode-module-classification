@@ -18,18 +18,30 @@
  */
 package org.incode.module.classification.fixture.app.classification.demo;
 
-import org.apache.isis.applib.annotation.*;
-import org.incode.module.classification.dom.impl.classification.*;
-import org.incode.module.classification.dom.spi.ApplicationTenancyService;
-import org.incode.module.classification.fixture.dom.demo.first.DemoObject;
-
 import javax.jdo.annotations.Column;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.InheritanceStrategy;
 
+import org.apache.isis.applib.annotation.DomainObject;
+import org.apache.isis.applib.annotation.DomainService;
+import org.apache.isis.applib.annotation.Editing;
+import org.apache.isis.applib.annotation.Mixin;
+import org.apache.isis.applib.annotation.NatureOfService;
+import org.apache.isis.applib.annotation.Property;
+
+import org.incode.module.classification.dom.impl.classification.Classification;
+import org.incode.module.classification.dom.impl.classification.ClassificationRepository;
+import org.incode.module.classification.dom.impl.classification.T_classifications;
+import org.incode.module.classification.dom.impl.classification.T_classify;
+import org.incode.module.classification.dom.impl.classification.T_unclassify;
+import org.incode.module.classification.dom.spi.ApplicationTenancyService;
+import org.incode.module.classification.fixture.dom.demo.first.DemoObject;
+
 @javax.jdo.annotations.PersistenceCapable(identityType= IdentityType.DATASTORE, schema ="incodeClassificationDemo")
 @javax.jdo.annotations.Inheritance(strategy = InheritanceStrategy.NEW_TABLE)
-@DomainObject
+@DomainObject(
+        objectType = "incodeClassificationDemo.ClassificationForDemoObject"
+)
 public class ClassificationForDemoObject extends Classification {
 
     //region > demoObject (property)

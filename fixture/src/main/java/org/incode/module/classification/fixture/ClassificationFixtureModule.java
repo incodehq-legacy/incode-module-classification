@@ -16,8 +16,8 @@
  */
 package org.incode.module.classification.fixture;
 
-public final class AliasFixtureModule {
+public final class ClassificationFixtureModule {
 
-    private AliasFixtureModule(){}
+    private ClassificationFixtureModule(){}
 
 }
