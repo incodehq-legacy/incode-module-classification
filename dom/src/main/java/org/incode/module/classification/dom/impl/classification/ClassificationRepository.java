@@ -83,7 +83,7 @@ public class ClassificationRepository {
             final Object classified) {
 
         final Taxonomy taxonomy = category.getTaxonomy();
-        final Class<? extends Classification> subtype = subtypeClassFor(taxonomy, classified);
+        final Class<? extends Classification> subtype = subtypeClassFor(classified, taxonomy);
 
         final Classification classification = repositoryService.instantiate(subtype);
 
@@ -99,7 +99,9 @@ public class ClassificationRepository {
         return classification;
     }
 
-    private Class<? extends Classification> subtypeClassFor(Taxonomy taxonomy, final Object classified) {
+    private Class<? extends Classification> subtypeClassFor(
+            final Object classified,
+            final Taxonomy taxonomy) {
         Class<?> domainClass = classified.getClass();
         for (SubtypeProvider subtypeProvider : subtypeProviders) {
             Class<? extends Classification> subtype = subtypeProvider.subtypeFor(domainClass, taxonomy);
@@ -138,7 +140,7 @@ public class ClassificationRepository {
 
     /**
      * Convenience adapter to help implement the {@link SubtypeProvider} SPI; ignores the {@link Taxonomy} passed into
-     * {@link #subtypeClassFor(Taxonomy, Object)}, simply returns the class pair passed into constructor.
+     * {@link #subtypeFor(Class, Taxonomy)}, simply returns the class pair passed into constructor.
      */
     public abstract static class SubtypeProviderAbstract implements SubtypeProvider {
         private final Class<?> classifiedDomainType;
