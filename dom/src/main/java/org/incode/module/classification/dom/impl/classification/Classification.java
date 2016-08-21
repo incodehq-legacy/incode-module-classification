@@ -239,12 +239,12 @@ public abstract class Classification implements Comparable<Classification> {
 
     @Override
     public String toString() {
-        return ObjectContracts.toString(this, "reference", "atPath", "aliasTypeId");
+        return ObjectContracts.toString(this, "classifiedStr", "category");
     }
 
     @Override
     public int compareTo(final Classification other) {
-        return ObjectContracts.compare(this, other, "reference", "atPath", "aliasTypeId");
+        return ObjectContracts.compare(this, other, "classifiedStr", "category");
     }
 
     //endregion
