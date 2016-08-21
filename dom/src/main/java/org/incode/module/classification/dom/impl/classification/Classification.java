@@ -174,7 +174,7 @@ public abstract class Classification implements Comparable<Classification> {
 
     //region > classified (derived property, hooks)
     /**
-     * Polymorphic association to the aliased object.
+     * Polymorphic association to the classified object.
      */
     @Programmatic
     public abstract Object getClassified();
