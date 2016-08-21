@@ -27,7 +27,7 @@ tenancy path of a domain object is provided through the `ApplicationTenancyServi
 
 The following http://yuml.me[] class diagram highlights the main concepts:
 
-image::http://yuml.me/9a695ae7[link="http://yuml.me/9a695ae7"]
+image::http://yuml.me/de618edc[link="http://yuml.me/de618edc"]
 
 (The colours used in the diagram are - approximately - from link:https://en.wikipedia.org/wiki/Object_Modeling_in_Color[Object Modeling in Color]).
 
@@ -405,7 +405,7 @@ public interface ApplicationTenancyService {
 +
 This allows the module to find which taxonomies are applicable to the domain object.
 
-* implement the `SubtypeProvider` SPI interface: +
+* implement the `ClassificationRepository.SubtypeProvider` SPI interface: +
 +
 [source,java]
 ----
@@ -421,7 +421,7 @@ This tells the module which subclass of `Classification` to use to attach to the
 +
 These contribute the "classifications" collection and actions to add and remove ``Classification``s.
 
-Typically the SPI implementations and the mixin classes are nested static classes of the `Alias` subtype.
+Typically the SPI implementations and the mixin classes are nested static classes of the `Classification` subtype.
 
 
 
@@ -491,7 +491,6 @@ public class ClassificationForDemoObject extends Classification {               
         }
     }
 }
-
 ----
 <1> extend from `Classification`
 <2> the type-safe reference property to the "classified" domain object (in this case `DemoObject`).  In the RDBMS
@@ -511,7 +510,7 @@ to instantiate to attach to the "classified" domain object
 == UI Concerns
 
 The attached `Classification` objects are shown in two contexts: as a table of `Classification` objects for the
-"classified" domain object, and then as the actual subtype when the alias object itself is shown (eg
+"classified" domain object, and then as the actual subtype when the classification object itself is shown (eg
 `ClassificationForDemoObject` in the demo app).
 
 In the former case (as a table) the `Classification` will be rendered according to the `Classification.layout.xml`
@@ -526,10 +525,6 @@ obtained using default subscribers, eg `Classification.TitleSubscriber`, `Classi
 `Classification.CssClassSubscriber`.  The consuming module can override these values simply by providing alternative
 implementations.
 
-[TIP]
-====
-The (non-ASF) http://github.com/incodehq/incode-module-alias[Incode alias] module also allows the title/icon/CSS class to be overridden; its example application includes an example to demonstrate how this is done.
-====
 
 
 == Other Services
