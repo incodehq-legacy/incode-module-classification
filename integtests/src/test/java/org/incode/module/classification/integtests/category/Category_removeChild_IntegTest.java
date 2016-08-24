@@ -74,9 +74,6 @@ public class Category_removeChild_IntegTest extends ClassificationModuleIntegTes
 
     @Test
     public void happy_case_cascading() {
-        // TODO: same issue
-
-        // eg given "Sizes", can remove "Large" child.  All the children of "Large" should also be removed.
         // given
         Category sizes = categoryRepository.findByReference("SIZES");
         Category large = categoryRepository.findByReference("LGE");
