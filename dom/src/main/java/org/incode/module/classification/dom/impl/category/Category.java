@@ -64,6 +64,13 @@ import lombok.Setter;
                         + "WHERE taxonomy == :taxonomy "
                         + "ORDER BY fullyQualifiedOrdinal "),
         @javax.jdo.annotations.Query(
+                name = "findByTaxonomyAndReference", language = "JDOQL",
+                value = "SELECT "
+                        + "FROM org.incode.module.classification.dom.impl.category.Category "
+                        + "WHERE taxonomy == :taxonomy "
+                        + "&&    reference == :reference "
+                        + "ORDER BY fullyQualifiedOrdinal "),
+        @javax.jdo.annotations.Query(
                 name = "findByParent", language = "JDOQL",
                 value = "SELECT "
                         + "FROM org.incode.module.classification.dom.impl.category.Category "

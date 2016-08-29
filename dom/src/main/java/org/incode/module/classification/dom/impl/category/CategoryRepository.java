@@ -52,6 +52,17 @@ public class CategoryRepository {
     }
     //endregion
 
+    //region > findByTaxonomy (programmatic)
+    @Programmatic
+    public Category findByTaxonomyAndReference(final Taxonomy taxonomy, final String reference) {
+        return repositoryService.uniqueMatch(
+                new QueryDefault<>(Category.class,
+                        "findByTaxonomyAndReference",
+                        "taxonomy", taxonomy,
+                        "reference", reference));
+    }
+    //endregion
+
     //region > findByParent (programmatic)
     @Programmatic
     public List<Category> findByParent(final Category parent) {
