@@ -12,6 +12,7 @@
                     <bs3:row>
                         <bs3:col span="12">
                             <cpt:fieldSet name="Name" id="general" unreferencedProperties="true">
+                                <cpt:action id="refreshDerivedValues" position="PANEL"/>
                                 <cpt:property id="taxonomy"/>
                                 <cpt:property id="fullyQualifiedName" hidden="OBJECT_FORMS"/>
                                 <cpt:property id="fullyQualifiedOrdinal" hidden="OBJECT_FORMS"/>

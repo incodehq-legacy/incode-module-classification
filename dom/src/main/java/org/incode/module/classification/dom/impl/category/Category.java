@@ -204,6 +204,12 @@ public class Category implements Comparable<Category> {
         deriveFullyQualifiedOrdinal();
     }
 
+    public Category refreshDerivedValues() {
+        deriveFullyQualifiedName();
+        deriveFullyQualifiedOrdinal();
+        return this;
+    }
+
     private void deriveFullyQualifiedName() {
         StringBuilder buf = new StringBuilder();
         prependName(this, buf);
