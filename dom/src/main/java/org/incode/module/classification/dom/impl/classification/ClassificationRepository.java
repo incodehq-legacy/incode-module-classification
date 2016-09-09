@@ -152,8 +152,8 @@ public class ClassificationRepository {
         }
 
         @Override
-        public Class<? extends Classification> subtypeFor(final Class<?> domainType, Taxonomy taxonomy) {
-            return domainType.isAssignableFrom(classifiedDomainType) ? classifiedSubtype : null;
+        public Class<? extends Classification> subtypeFor(final Class<?> candidateClassifiedDomainType, Taxonomy taxonomy) {
+            return classifiedDomainType.isAssignableFrom(candidateClassifiedDomainType) ? classifiedSubtype : null;
         }
     }
 
