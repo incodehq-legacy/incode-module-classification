@@ -326,7 +326,7 @@ To use "out-of-the-box":
 <dependency>
     <groupId>org.incode.module.classification</groupId>
     <artifactId>incode-module-classification-dom</artifactId>
-    <version>1.13.0</version>
+    <version>1.13.1</version>
 </dependency>
 ----
 
@@ -550,6 +550,7 @@ None at this time.
 
 == Change Log
 
+* `1.13.1` - released against Isis 1.13.1, closes link:https://github.com/incodehq/incode-module-classification/issues/1[#1].
 * `1.13.0` - released against Isis 1.13.0
 
 

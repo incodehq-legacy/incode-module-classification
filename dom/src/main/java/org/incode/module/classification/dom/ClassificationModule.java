@@ -26,7 +26,7 @@ public final class ClassificationModule {
         private JdoColumnLength(){}
 
         public static final int CATEGORY_REFERENCE = 24;
-        public static final int CATEGORY_NAME = 50;
+        public static final int CATEGORY_NAME = 100;
         public static final int CATEGORY_FQNAME = 254;
         public static final int CATEGORY_FQORDINAL = 50;
 
