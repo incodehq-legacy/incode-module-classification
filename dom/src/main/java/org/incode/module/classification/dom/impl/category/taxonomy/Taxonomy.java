@@ -1,25 +1,34 @@
 package org.incode.module.classification.dom.impl.category.taxonomy;
 
-import lombok.Getter;
-import lombok.Setter;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
-import org.apache.isis.applib.annotation.*;
+import javax.inject.Inject;
+import javax.jdo.annotations.DiscriminatorStrategy;
+import javax.jdo.annotations.InheritanceStrategy;
+
+import org.apache.isis.applib.annotation.Action;
+import org.apache.isis.applib.annotation.ActionLayout;
 import org.apache.isis.applib.annotation.Collection;
+import org.apache.isis.applib.annotation.DomainObject;
+import org.apache.isis.applib.annotation.Editing;
+import org.apache.isis.applib.annotation.MemberOrder;
+import org.apache.isis.applib.annotation.ParameterLayout;
+import org.apache.isis.applib.annotation.SemanticsOf;
 import org.apache.isis.applib.services.i18n.TranslatableString;
 
 import org.incode.module.classification.dom.impl.applicability.Applicability;
 import org.incode.module.classification.dom.impl.category.Category;
 import org.incode.module.classification.dom.impl.category.CategoryRepository;
 
-import javax.inject.Inject;
-import javax.jdo.annotations.InheritanceStrategy;
-
-import java.util.*;
-import java.util.Optional;
-import java.util.function.Predicate;
+import lombok.Getter;
+import lombok.Setter;
 
 @javax.jdo.annotations.PersistenceCapable
 @javax.jdo.annotations.Inheritance(strategy = InheritanceStrategy.SUPERCLASS_TABLE)
+@javax.jdo.annotations.Discriminator(
+        strategy = DiscriminatorStrategy.VALUE_MAP,
+        value = "org.incode.module.classification.dom.impl.category.taxonomy.Taxonomy")
 @DomainObject(
         editing = Editing.DISABLED
 )

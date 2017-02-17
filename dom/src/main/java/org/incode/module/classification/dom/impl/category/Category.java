@@ -55,7 +55,10 @@ import lombok.Setter;
 @javax.jdo.annotations.Version(
         strategy = VersionStrategy.VERSION_NUMBER,
         column = "version")
-@javax.jdo.annotations.Discriminator(strategy = DiscriminatorStrategy.CLASS_NAME) // can just check if has a parent
+@javax.jdo.annotations.Discriminator(
+        strategy = DiscriminatorStrategy.VALUE_MAP,
+        value = "org.incode.module.classification.dom.impl.category.Category"
+)
 @javax.jdo.annotations.Queries({
         @javax.jdo.annotations.Query(
                 name = "findByTaxonomy", language = "JDOQL",
@@ -159,7 +162,7 @@ public class Category implements Comparable<Category> {
         }
     }
 
-    @DomainService
+    @DomainService(nature = NatureOfService.DOMAIN)
     public static class IconSubscriber extends AbstractSubscriber {
         @EventHandler
         @Subscribe
@@ -174,7 +177,7 @@ public class Category implements Comparable<Category> {
     /**
      * Implemented as a subscriber so can be overridden by consuming application if required.
      */
-    @DomainService
+    @DomainService(nature = NatureOfService.DOMAIN)
     public static class CssClassSubscriber extends AbstractSubscriber {
         @EventHandler
         @Subscribe
@@ -187,7 +190,7 @@ public class Category implements Comparable<Category> {
     }
     //endregion
 
-    //region > constructorle
+    //region > constructor
     protected Category(
             final Category parent,
             final String name,
